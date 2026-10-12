@@ -1,0 +1,105 @@
+{% extends "_layouts/cp" %}
+
+{% set title = "Sale Scheduler Dashboard"|t('commerce-sale-scheduler') %}
+{% set selectedSubnavItem = 'dashboard' %}
+
+{% block actionButton %}
+    <a href="{{ cpUrl('sale-scheduler/sales/new') }}" class="btn submit add icon">{{ "Create Sale"|t('commerce-sale-scheduler') }}</a>
+{% endblock %}
+
+{% block content %}
+    {# Stats Grid #}
+    <div class="sale-scheduler-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px;">
+            <div style="font-size:12px; font-weight:600; color:#6a737d; text-transform:uppercase; margin-bottom:6px;">{{ "Total Sales"|t('commerce-sale-scheduler') }}</div>
+            <div style="font-size:28px; font-weight:700; color:#1f2328;">{{ stats.total }}</div>
+        </div>
+
+        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px; border-left:4px solid #1a7f37;">
+            <div style="font-size:12px; font-weight:600; color:#1a7f37; text-transform:uppercase; margin-bottom:6px;">{{ "Active Sales"|t('commerce-sale-scheduler') }}</div>
+            <div style="font-size:28px; font-weight:700; color:#1a7f37;">{{ stats.active }}</div>
+        </div>
+
+        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px; border-left:4px solid #0969da;">
+            <div style="font-size:12px; font-weight:600; color:#0969da; text-transform:uppercase; margin-bottom:6px;">{{ "Scheduled"|t('commerce-sale-scheduler') }}</div>
+            <div style="font-size:28px; font-weight:700; color:#0969da;">{{ stats.scheduled }}</div>
+        </div>
+
+        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px; border-left:4px solid #bf8700;">
+            <div style="font-size:12px; font-weight:600; color:#bf8700; text-transform:uppercase; margin-bottom:6px;">{{ "Expiring Soon (48h)"|t('commerce-sale-scheduler') }}</div>
+            <div style="font-size:28px; font-weight:700; color:#bf8700;">{{ stats.expiringSoon }}</div>
+        </div>
+
+        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px; border-left:4px solid #cf222e;">
+            <div style="font-size:12px; font-weight:600; color:#cf222e; text-transform:uppercase; margin-bottom:6px;">{{ "Pricing Conflicts"|t('commerce-sale-scheduler') }}</div>
+            <div style="font-size:28px; font-weight:700; color:#cf222e;">{{ stats.conflicts }}</div>
+        </div>
+    </div>
+
+    {# Conflicts Notice #}
+    {% if conflicts|length %}
+        <div class="notice" style="background:#fff8c5; border:1px solid #d4a72c; border-radius:6px; padding:14px 18px; margin-bottom:24px; color:#4d2d00;">
+            <p style="font-weight:700; margin:0 0 6px 0;">⚠️ {{ "Pricing Conflicts Detected"|t('commerce-sale-scheduler') }}</p>
+            <ul style="margin:0; padding-left:18px;">
+                {% for conflict in conflicts %}
+                    <li>
+                        <strong>{{ conflict.sale1.name }}</strong> (Priority: {{ conflict.sale1.priority }}) and <strong>{{ conflict.sale2.name }}</strong> (Priority: {{ conflict.sale2.priority }}): {{ conflict.reason }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {# Recent Sales Table #}
+    <h2>{{ "Recently Updated Sales"|t('commerce-sale-scheduler') }}</h2>
+
+    {% if recentSales|length %}
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th scope="col">{{ "Sale Name"|t('commerce-sale-scheduler') }}</th>
+                    <th scope="col">{{ "Status"|t('commerce-sale-scheduler') }}</th>
+                    <th scope="col">{{ "Discount"|t('commerce-sale-scheduler') }}</th>
+                    <th scope="col">{{ "Schedule"|t('commerce-sale-scheduler') }}</th>
+                    <th scope="col">{{ "Priority"|t('commerce-sale-scheduler') }}</th>
+                    <th scope="col">{{ "Actions"|t('commerce-sale-scheduler') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in recentSales %}
+                    {% set status = sale.getStatus() %}
+                    <tr>
+                        <td>
+                            <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}"><strong>{{ sale.name }}</strong></a>
+                            {% if sale.description %}
+                                <div class="light" style="font-size:12px;">{{ sale.description|slice(0, 80) }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status {{ status == 'active' ? 'green' : (status == 'scheduled' ? 'blue' : (status == 'expired' ? 'disabled' : 'red')) }}"></span>
+                            {{ sale.getStatusLabel() }}
+                        </td>
+                        <td>
+                            <code>{{ sale.getFormattedDiscount() }}</code>
+                        </td>
+                        <td class="light" style="font-size:12px;">
+                            {% if sale.dateFrom or sale.dateTo %}
+                                {{ sale.dateFrom ? sale.dateFrom|date('short') : 'Anytime' }} &rarr; {{ sale.dateTo ? sale.dateTo|date('short') : 'Ongoing' }}
+                            {% else %}
+                                {{ "Always active"|t('commerce-sale-scheduler') }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ sale.priority }}
+                        </td>
+                        <td>
+                            <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}" class="btn small">{{ "Edit"|t('commerce-sale-scheduler') }}</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="light">{{ "No sales configured yet."|t('commerce-sale-scheduler') }} <a href="{{ cpUrl('sale-scheduler/sales/new') }}">{{ "Create your first sale"|t('commerce-sale-scheduler') }} &rarr;</a></p>
+    {% endif %}
+{% endblock %}

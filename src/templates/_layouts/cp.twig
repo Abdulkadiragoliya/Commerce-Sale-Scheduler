@@ -1,0 +1,10 @@
+{% extends "_layouts/cp" %}
+
+{% set selectedSubnavItem = selectedSubnavItem ?? 'dashboard' %}
+
+{% block content %}
+    <div class="sale-scheduler-container">
+        {% block mainContent %}
+        {% endblock %}
+    </div>
+{% endblock %}

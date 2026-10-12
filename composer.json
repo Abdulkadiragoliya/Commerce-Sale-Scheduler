@@ -1,0 +1,54 @@
+{
+  "name": "abdulkadiragoliya/commerce-sale-scheduler",
+  "description": "Dynamic scheduled sales, category promotions, custom promotional tags, and countdown timers for Craft Commerce 5.",
+  "type": "craft-plugin",
+  "keywords": [
+    "craft",
+    "cms",
+    "craftcms",
+    "craft-plugin",
+    "commerce",
+    "craft-commerce",
+    "sale",
+    "sale-scheduler",
+    "discounts",
+    "promotions",
+    "countdown"
+  ],
+  "homepage": "https://github.com/Abdulkadiragoliya/Commerce-Sale-Scheduler",
+  "support": {
+    "email": "abdulkadir.agoliya@gmail.com",
+    "docs": "https://github.com/Abdulkadiragoliya/Commerce-Sale-Scheduler#readme",
+    "issues": "https://github.com/Abdulkadiragoliya/Commerce-Sale-Scheduler/issues"
+  },
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Abdulkadir Agoliya",
+      "homepage": "https://github.com/Abdulkadiragoliya"
+    }
+  ],
+  "require": {
+    "php": "^8.2.0",
+    "craftcms/cms": "^5.0.0",
+    "craftcms/commerce": "^5.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "abdulkadiragoliya\\commercesalescheduler\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "abdulkadiragoliya\\commercesaleschedulertests\\": "tests/"
+    }
+  },
+  "extra": {
+    "name": "Commerce Sale Scheduler",
+    "handle": "commerce-sale-scheduler",
+    "developer": "Abdulkadir Agoliya",
+    "developerUrl": "https://github.com/Abdulkadiragoliya",
+    "documentationUrl": "https://github.com/Abdulkadiragoliya/Commerce-Sale-Scheduler#readme",
+    "class": "abdulkadiragoliya\\commercesalescheduler\\Plugin"
+  }
+}

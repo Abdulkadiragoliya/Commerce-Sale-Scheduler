@@ -1,0 +1,207 @@
+/**
+ * Commerce Sale Scheduler - Storefront Styles
+ */
+
+/* Relative wrapper container helper */
+.has-sale-tag {
+    position: relative !important;
+}
+
+/* Promotional Tag Badges */
+.sale-tag-badge {
+    position: absolute;
+    z-index: 10;
+    pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.sale-tag-badge--top-right {
+    top: 12px;
+    right: 12px;
+}
+
+.sale-tag-badge--top-left {
+    top: 12px;
+    left: 12px;
+}
+
+.sale-tag-badge--bottom-right {
+    bottom: 12px;
+    right: 12px;
+}
+
+.sale-tag-badge--bottom-left {
+    bottom: 12px;
+    left: 12px;
+}
+
+.sale-tag-badge__image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
+}
+
+.sale-tag-badge--text {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 6px 12px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
+}
+
+/* Price Display Component */
+.sale-price-display {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 10px;
+    margin: 6px 0;
+    font-family: inherit;
+}
+
+.sale-price-display__current {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.sale-price-display--on-sale .sale-price-display__current {
+    color: #dc2626;
+}
+
+.sale-price-display__original del {
+    font-size: 1rem;
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.sale-price-display__badge {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid #fecaca;
+    letter-spacing: 0.02em;
+}
+
+.sale-price-display__savings {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #059669;
+}
+
+/* Countdown Timer */
+.sale-countdown-timer {
+    margin: 14px 0;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    max-width: 100%;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.sale-countdown__header {
+    margin-bottom: 8px;
+}
+
+.sale-countdown__heading {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #4b5563;
+}
+
+.sale-countdown__units {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sale-countdown__unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 44px;
+}
+
+.sale-countdown__digit {
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #111827;
+    font-variant-numeric: tabular-nums;
+}
+
+.sale-countdown__label {
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    color: #6b7280;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.sale-countdown__separator {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #9ca3af;
+    margin-bottom: 12px;
+}
+
+/* Countdown Boxed Style */
+.sale-countdown--boxed {
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.sale-countdown--boxed .sale-countdown__unit {
+    background: #111827;
+    color: #ffffff;
+    padding: 6px 8px;
+    border-radius: 8px;
+    min-width: 48px;
+}
+
+.sale-countdown--boxed .sale-countdown__digit {
+    color: #ffffff;
+}
+
+.sale-countdown--boxed .sale-countdown__label {
+    color: #9ca3af;
+}
+
+/* Countdown Minimal Style */
+.sale-countdown--minimal {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.sale-countdown--minimal .sale-countdown__digit {
+    font-size: 1.125rem;
+    color: #dc2626;
+}
+
+/* Cohesive Sale Block */
+.sale-scheduler-block {
+    position: relative;
+    padding: 16px;
+    border: 1px solid #fecaca;
+    background: #fff5f5;
+    border-radius: 12px;
+    margin: 16px 0;
+}

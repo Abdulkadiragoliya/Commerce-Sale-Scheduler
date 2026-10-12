@@ -1,0 +1,330 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set selectedSubnavItem = 'sales' %}
+{% set fullPageForm = true %}
+
+{% block content %}
+    <form method="post" action="" accept-charset="UTF-8">
+        {{ csrfInput() }}
+        {{ actionInput('commerce-sale-scheduler/sales/save') }}
+        {{ redirectInput('sale-scheduler/sales') }}
+        {% if sale.id %}
+            <input type="hidden" name="id" value="{{ sale.id }}">
+        {% endif %}
+
+        <div id="sale-tabs">
+            <h2>{{ "General Details"|t('commerce-sale-scheduler') }}</h2>
+
+            {{ forms.textField({
+                label: "Sale Name"|t('commerce-sale-scheduler'),
+                instructions: "Name of the sale for identification and badges."|t('commerce-sale-scheduler'),
+                id: 'name',
+                name: 'name',
+                value: sale.name,
+                errors: sale.getErrors('name'),
+                required: true,
+                autofocus: true
+            }) }}
+
+            {{ forms.textareaField({
+                label: "Internal Description"|t('commerce-sale-scheduler'),
+                instructions: "Optional administrative notes describing the purpose of this promotion."|t('commerce-sale-scheduler'),
+                id: 'description',
+                name: 'description',
+                value: sale.description,
+                rows: 2
+            }) }}
+
+            <div class="flex" style="gap: 20px;">
+                {{ forms.lightswitchField({
+                    label: "Enabled"|t('commerce-sale-scheduler'),
+                    instructions: "Whether this sale is actively applied when date criteria are met."|t('commerce-sale-scheduler'),
+                    id: 'enabled',
+                    name: 'enabled',
+                    on: sale.enabled
+                }) }}
+
+                {{ forms.textField({
+                    label: "Priority"|t('commerce-sale-scheduler'),
+                    instructions: "Tie-breaking priority integer. Higher number wins over lower priority sales."|t('commerce-sale-scheduler'),
+                    id: 'priority',
+                    name: 'priority',
+                    type: 'number',
+                    value: sale.priority,
+                    size: 6
+                }) }}
+            </div>
+
+            <hr>
+
+            <h2>{{ "Schedule"|t('commerce-sale-scheduler') }}</h2>
+            <div class="flex" style="gap: 20px; flex-wrap: wrap;">
+                {{ forms.dateTimeField({
+                    label: "Start Date & Time"|t('commerce-sale-scheduler'),
+                    instructions: "When the sale becomes active (optional; leave blank for immediate)."|t('commerce-sale-scheduler'),
+                    id: 'dateFrom',
+                    name: 'dateFrom',
+                    value: sale.dateFrom,
+                    errors: sale.getErrors('dateFrom')
+                }) }}
+
+                {{ forms.dateTimeField({
+                    label: "End Date & Time"|t('commerce-sale-scheduler'),
+                    instructions: "When the sale expires (optional; leave blank for ongoing)."|t('commerce-sale-scheduler'),
+                    id: 'dateTo',
+                    name: 'dateTo',
+                    value: sale.dateTo,
+                    errors: sale.getErrors('dateTo')
+                }) }}
+            </div>
+
+            <hr>
+
+            <h2>{{ "Discount Configuration"|t('commerce-sale-scheduler') }}</h2>
+
+            <div class="flex" style="gap: 20px; flex-wrap: wrap;">
+                {{ forms.selectField({
+                    label: "Discount Type"|t('commerce-sale-scheduler'),
+                    instructions: "Choose percentage off or fixed currency amount off."|t('commerce-sale-scheduler'),
+                    id: 'discountType',
+                    name: 'discountType',
+                    value: sale.discountType,
+                    options: [
+                        { label: "Percentage (%) Off"|t('commerce-sale-scheduler'), value: 'percentage' },
+                        { label: "Fixed Amount Off"|t('commerce-sale-scheduler'), value: 'fixed' }
+                    ]
+                }) }}
+
+                {{ forms.textField({
+                    label: "Discount Value"|t('commerce-sale-scheduler'),
+                    instructions: "Percentage number (e.g. 20) or fixed currency amount (e.g. 15.00)."|t('commerce-sale-scheduler'),
+                    id: 'discountValue',
+                    name: 'discountValue',
+                    type: 'number',
+                    step: 'any',
+                    value: sale.discountValue,
+                    errors: sale.getErrors('discountValue'),
+                    required: true
+                }) }}
+            </div>
+
+            <hr>
+
+            <h2>{{ "Targeting & Assignments"|t('commerce-sale-scheduler') }}</h2>
+            <p class="light">{{ "Assign products directly, or dynamically target entire categories. Variant assignments take precedence over product assignments, which take precedence over categories."|t('commerce-sale-scheduler') }}</p>
+
+            {{ forms.elementSelectField({
+                label: "Target Products"|t('commerce-sale-scheduler'),
+                instructions: "Select products explicitly targeted by this sale."|t('commerce-sale-scheduler'),
+                id: 'productIds',
+                name: 'productIds',
+                elementType: 'craft\\commerce\\elements\\Product',
+                elements: sale.productIds ? craft.products.id(sale.productIds).all() : [],
+                limit: null
+            }) }}
+
+            {{ forms.lightswitchField({
+                label: "Apply to All Variants"|t('commerce-sale-scheduler'),
+                instructions: "When enabled, all variants of targeted products receive the discount."|t('commerce-sale-scheduler'),
+                id: 'applyToAllVariants',
+                name: 'applyToAllVariants',
+                on: sale.applyToAllVariants
+            }) }}
+
+            {{ forms.elementSelectField({
+                label: "Target Specific Variants (Optional)"|t('commerce-sale-scheduler'),
+                instructions: "Target individual variants specifically (takes highest precedence)."|t('commerce-sale-scheduler'),
+                id: 'variantIds',
+                name: 'variantIds',
+                elementType: 'craft\\commerce\\elements\\Variant',
+                elements: sale.variantIds ? craft.variants.id(sale.variantIds).all() : [],
+                limit: null
+            }) }}
+
+            {{ forms.elementSelectField({
+                label: "Target Categories (Dynamic Category Sales)"|t('commerce-sale-scheduler'),
+                instructions: "Products in these categories automatically receive the sale. Newly categorized products are included dynamically."|t('commerce-sale-scheduler'),
+                id: 'categoryIds',
+                name: 'categoryIds',
+                elementType: 'craft\\elements\\Category',
+                elements: sale.categoryIds ? craft.categories.id(sale.categoryIds).all() : [],
+                limit: null
+            }) }}
+
+            {{ forms.elementSelectField({
+                label: "Product Exclusions"|t('commerce-sale-scheduler'),
+                instructions: "Products explicitly excluded from this sale even if they belong to targeted categories."|t('commerce-sale-scheduler'),
+                id: 'exclusionIds',
+                name: 'exclusionIds',
+                elementType: 'craft\\commerce\\elements\\Product',
+                elements: sale.exclusionIds ? craft.products.id(sale.exclusionIds).all() : [],
+                limit: null
+            }) }}
+
+            <div class="notice" style="background:#f6f8fa; border:1px solid #d0d7de; border-radius:6px; padding:12px 16px; margin: 16px 0;">
+                <strong>{{ "Estimated Coverage:"|t('commerce-sale-scheduler') }}</strong>
+                {{ affectedCounts.products }} {{ "product(s)"|t('commerce-sale-scheduler') }}, 
+                {{ affectedCounts.variants }} {{ "variant(s) affected."|t('commerce-sale-scheduler') }}
+            </div>
+
+            <hr>
+
+            <h2>{{ "Tag & Badge Settings"|t('commerce-sale-scheduler') }}</h2>
+
+            <div class="flex" style="gap:20px; flex-wrap:wrap;">
+                {{ forms.lightswitchField({
+                    label: "Enable Tag Badge"|t('commerce-sale-scheduler'),
+                    instructions: "Display promotional badge/tag over product images."|t('commerce-sale-scheduler'),
+                    id: 'tagEnabled',
+                    name: 'tagEnabled',
+                    on: sale.tagEnabled
+                }) }}
+
+                {{ forms.textField({
+                    label: "Tag Badge Width / Size"|t('commerce-sale-scheduler'),
+                    instructions: "CSS width (e.g. 80px or 25%)."|t('commerce-sale-scheduler'),
+                    id: 'tagWidth',
+                    name: 'tagWidth',
+                    value: sale.tagWidth
+                }) }}
+            </div>
+
+            {{ forms.elementSelectField({
+                label: "Promotional Tag Image Asset"|t('commerce-sale-scheduler'),
+                instructions: "Select or upload an image asset (PNG, JPEG, WebP) to display as the promotional badge."|t('commerce-sale-scheduler'),
+                id: 'tagAssetId',
+                name: 'tagAssetId',
+                elementType: 'craft\\elements\\Asset',
+                elements: sale.tagAssetId ? craft.assets.id(sale.tagAssetId).all() : [],
+                limit: 1
+            }) }}
+
+            {{ forms.textField({
+                label: "Tag Label / Alt Text / Text Badge Fallback"|t('commerce-sale-scheduler'),
+                instructions: "Image alternative text, or text displayed if no image asset is selected (e.g. 'FLASH SALE' or '25% OFF')."|t('commerce-sale-scheduler'),
+                id: 'tagText',
+                name: 'tagText',
+                value: sale.tagText
+            }) }}
+
+            <div class="flex" style="gap:20px; flex-wrap:wrap;">
+                {{ forms.selectField({
+                    label: "Position on Listing Cards"|t('commerce-sale-scheduler'),
+                    id: 'tagPositionListing',
+                    name: 'tagPositionListing',
+                    value: sale.tagPositionListing,
+                    options: [
+                        { label: "Top Right"|t('commerce-sale-scheduler'), value: 'top-right' },
+                        { label: "Top Left"|t('commerce-sale-scheduler'), value: 'top-left' },
+                        { label: "Bottom Right"|t('commerce-sale-scheduler'), value: 'bottom-right' },
+                        { label: "Bottom Left"|t('commerce-sale-scheduler'), value: 'bottom-left' }
+                    ]
+                }) }}
+
+                {{ forms.selectField({
+                    label: "Position on Product Detail Page"|t('commerce-sale-scheduler'),
+                    id: 'tagPositionDetail',
+                    name: 'tagPositionDetail',
+                    value: sale.tagPositionDetail,
+                    options: [
+                        { label: "Top Right"|t('commerce-sale-scheduler'), value: 'top-right' },
+                        { label: "Top Left"|t('commerce-sale-scheduler'), value: 'top-left' },
+                        { label: "Bottom Right"|t('commerce-sale-scheduler'), value: 'bottom-right' },
+                        { label: "Bottom Left"|t('commerce-sale-scheduler'), value: 'bottom-left' }
+                    ]
+                }) }}
+            </div>
+
+            <hr>
+
+            <h2>{{ "Countdown Timer Settings"|t('commerce-sale-scheduler') }}</h2>
+
+            <div class="flex" style="gap:20px; flex-wrap:wrap;">
+                {{ forms.lightswitchField({
+                    label: "Enable Countdown Timer"|t('commerce-sale-scheduler'),
+                    instructions: "Show countdown until sale expiration date."|t('commerce-sale-scheduler'),
+                    id: 'countdownEnabled',
+                    name: 'countdownEnabled',
+                    on: sale.countdownEnabled
+                }) }}
+
+                {{ forms.selectField({
+                    label: "Countdown Style"|t('commerce-sale-scheduler'),
+                    id: 'countdownStyle',
+                    name: 'countdownStyle',
+                    value: sale.countdownStyle,
+                    options: [
+                        { label: "Compact Style"|t('commerce-sale-scheduler'), value: 'compact' },
+                        { label: "Boxed Dark Style"|t('commerce-sale-scheduler'), value: 'boxed' },
+                        { label: "Minimal Style"|t('commerce-sale-scheduler'), value: 'minimal' }
+                    ]
+                }) }}
+            </div>
+
+            {{ forms.textField({
+                label: "Countdown Heading"|t('commerce-sale-scheduler'),
+                instructions: "Custom title (e.g. 'Hurry, Sale Ends In:')."|t('commerce-sale-scheduler'),
+                id: 'countdownHeading',
+                name: 'countdownHeading',
+                value: sale.countdownHeading
+            }) }}
+
+            <div class="flex" style="gap:20px; flex-wrap:wrap;">
+                {{ forms.lightswitchField({
+                    label: "Show on Product Detail Page"|t('commerce-sale-scheduler'),
+                    id: 'countdownShowDetail',
+                    name: 'countdownShowDetail',
+                    on: sale.countdownShowDetail
+                }) }}
+
+                {{ forms.lightswitchField({
+                    label: "Show on Product Listing Cards"|t('commerce-sale-scheduler'),
+                    id: 'countdownShowListing',
+                    name: 'countdownShowListing',
+                    on: sale.countdownShowListing
+                }) }}
+            </div>
+
+            <hr>
+
+            <h2>{{ "Price Display Options"|t('commerce-sale-scheduler') }}</h2>
+
+            <div class="flex" style="gap:20px; flex-wrap:wrap;">
+                {{ forms.lightswitchField({
+                    label: "Show Strikethrough Original Price"|t('commerce-sale-scheduler'),
+                    id: 'priceShowOriginal',
+                    name: 'priceShowOriginal',
+                    on: sale.priceShowOriginal
+                }) }}
+
+                {{ forms.lightswitchField({
+                    label: "Show Savings Amount & Percent"|t('commerce-sale-scheduler'),
+                    id: 'priceShowSavings',
+                    name: 'priceShowSavings',
+                    on: sale.priceShowSavings
+                }) }}
+
+                {{ forms.lightswitchField({
+                    label: "Show Promo Badge"|t('commerce-sale-scheduler'),
+                    id: 'priceShowBadge',
+                    name: 'priceShowBadge',
+                    on: sale.priceShowBadge
+                }) }}
+            </div>
+
+            {{ forms.textField({
+                label: "Custom Discount Badge Text (Optional)"|t('commerce-sale-scheduler'),
+                instructions: "Override default 'Save X%' with custom copy (e.g. 'SPECIAL DEAL')."|t('commerce-sale-scheduler'),
+                id: 'badgeText',
+                name: 'badgeText',
+                value: sale.badgeText
+            }) }}
+        </div>
+
+        <div class="buttons" style="margin-top:24px;">
+            <input type="submit" class="btn submit" value="{{ 'Save Sale'|t('commerce-sale-scheduler') }}">
+            <a href="{{ cpUrl('sale-scheduler/sales') }}" class="btn">{{ 'Cancel'|t('commerce-sale-scheduler') }}</a>
+        </div>
+    </form>
+{% endblock %}

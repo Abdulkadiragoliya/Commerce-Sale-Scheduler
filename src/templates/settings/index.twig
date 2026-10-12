@@ -1,0 +1,177 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set title = "Sale Scheduler Settings"|t('commerce-sale-scheduler') %}
+{% set selectedSubnavItem = 'settings' %}
+{% set fullPageForm = true %}
+
+{% block content %}
+    <form method="post" action="" accept-charset="UTF-8">
+        {{ csrfInput() }}
+        {{ actionInput('commerce-sale-scheduler/settings/save') }}
+        {{ redirectInput('sale-scheduler/settings') }}
+
+        <h2>{{ "Default Promotional Tag Settings"|t('commerce-sale-scheduler') }}</h2>
+
+        <div class="flex" style="gap:20px; flex-wrap:wrap;">
+            {{ forms.lightswitchField({
+                label: "Enable Tags by Default"|t('commerce-sale-scheduler'),
+                id: 'defaultTagEnabled',
+                name: 'settings[defaultTagEnabled]',
+                on: settings.defaultTagEnabled
+            }) }}
+
+            {{ forms.textField({
+                label: "Default Tag Width / Size"|t('commerce-sale-scheduler'),
+                id: 'defaultTagWidth',
+                name: 'settings[defaultTagWidth]',
+                value: settings.defaultTagWidth
+            }) }}
+        </div>
+
+        <div class="flex" style="gap:20px; flex-wrap:wrap;">
+            {{ forms.selectField({
+                label: "Default Listing Tag Position"|t('commerce-sale-scheduler'),
+                id: 'defaultTagPositionListing',
+                name: 'settings[defaultTagPositionListing]',
+                value: settings.defaultTagPositionListing,
+                options: [
+                    { label: "Top Right"|t('commerce-sale-scheduler'), value: 'top-right' },
+                    { label: "Top Left"|t('commerce-sale-scheduler'), value: 'top-left' },
+                    { label: "Bottom Right"|t('commerce-sale-scheduler'), value: 'bottom-right' },
+                    { label: "Bottom Left"|t('commerce-sale-scheduler'), value: 'bottom-left' }
+                ]
+            }) }}
+
+            {{ forms.selectField({
+                label: "Default Detail Tag Position"|t('commerce-sale-scheduler'),
+                id: 'defaultTagPositionDetail',
+                name: 'settings[defaultTagPositionDetail]',
+                value: settings.defaultTagPositionDetail,
+                options: [
+                    { label: "Top Right"|t('commerce-sale-scheduler'), value: 'top-right' },
+                    { label: "Top Left"|t('commerce-sale-scheduler'), value: 'top-left' },
+                    { label: "Bottom Right"|t('commerce-sale-scheduler'), value: 'bottom-right' },
+                    { label: "Bottom Left"|t('commerce-sale-scheduler'), value: 'bottom-left' }
+                ]
+            }) }}
+        </div>
+
+        <hr>
+
+        <h2>{{ "Default Countdown Timer Settings"|t('commerce-sale-scheduler') }}</h2>
+
+        <div class="flex" style="gap:20px; flex-wrap:wrap;">
+            {{ forms.lightswitchField({
+                label: "Enable Countdown by Default"|t('commerce-sale-scheduler'),
+                id: 'defaultCountdownEnabled',
+                name: 'settings[defaultCountdownEnabled]',
+                on: settings.defaultCountdownEnabled
+            }) }}
+
+            {{ forms.selectField({
+                label: "Default Countdown Style"|t('commerce-sale-scheduler'),
+                id: 'defaultCountdownStyle',
+                name: 'settings[defaultCountdownStyle]',
+                value: settings.defaultCountdownStyle,
+                options: [
+                    { label: "Compact Style"|t('commerce-sale-scheduler'), value: 'compact' },
+                    { label: "Boxed Dark Style"|t('commerce-sale-scheduler'), value: 'boxed' },
+                    { label: "Minimal Style"|t('commerce-sale-scheduler'), value: 'minimal' }
+                ]
+            }) }}
+        </div>
+
+        <div class="flex" style="gap:20px; flex-wrap:wrap;">
+            {{ forms.lightswitchField({
+                label: "Show Countdown on Listings by Default"|t('commerce-sale-scheduler'),
+                id: 'defaultCountdownShowListing',
+                name: 'settings[defaultCountdownShowListing]',
+                on: settings.defaultCountdownShowListing
+            }) }}
+
+            {{ forms.lightswitchField({
+                label: "Show Countdown on Product Detail by Default"|t('commerce-sale-scheduler'),
+                id: 'defaultCountdownShowDetail',
+                name: 'settings[defaultCountdownShowDetail]',
+                on: settings.defaultCountdownShowDetail
+            }) }}
+        </div>
+
+        <h3>{{ "Countdown Unit Labels"|t('commerce-sale-scheduler') }}</h3>
+        <div class="flex" style="gap:16px; flex-wrap:wrap;">
+            {{ forms.textField({
+                label: "Days Label"|t('commerce-sale-scheduler'),
+                name: 'settings[primaryCountdownLabelDays]',
+                value: settings.primaryCountdownLabelDays,
+                size: 8
+            }) }}
+
+            {{ forms.textField({
+                label: "Hours Label"|t('commerce-sale-scheduler'),
+                name: 'settings[primaryCountdownLabelHours]',
+                value: settings.primaryCountdownLabelHours,
+                size: 8
+            }) }}
+
+            {{ forms.textField({
+                label: "Minutes Label"|t('commerce-sale-scheduler'),
+                name: 'settings[primaryCountdownLabelMinutes]',
+                value: settings.primaryCountdownLabelMinutes,
+                size: 8
+            }) }}
+
+            {{ forms.textField({
+                label: "Seconds Label"|t('commerce-sale-scheduler'),
+                name: 'settings[primaryCountdownLabelSeconds]',
+                value: settings.primaryCountdownLabelSeconds,
+                size: 8
+            }) }}
+        </div>
+
+        <hr>
+
+        <h2>{{ "Default Price Display Settings"|t('commerce-sale-scheduler') }}</h2>
+
+        <div class="flex" style="gap:20px; flex-wrap:wrap;">
+            {{ forms.lightswitchField({
+                label: "Show Strikethrough Original Price by Default"|t('commerce-sale-scheduler'),
+                id: 'defaultPriceShowOriginal',
+                name: 'settings[defaultPriceShowOriginal]',
+                on: settings.defaultPriceShowOriginal
+            }) }}
+
+            {{ forms.lightswitchField({
+                label: "Show Savings Amount by Default"|t('commerce-sale-scheduler'),
+                id: 'defaultPriceShowSavings',
+                name: 'settings[defaultPriceShowSavings]',
+                on: settings.defaultPriceShowSavings
+            }) }}
+
+            {{ forms.lightswitchField({
+                label: "Show Promo Badge by Default"|t('commerce-sale-scheduler'),
+                id: 'defaultPriceShowBadge',
+                name: 'settings[defaultPriceShowBadge]',
+                on: settings.defaultPriceShowBadge
+            }) }}
+        </div>
+
+        <hr>
+
+        <h2>{{ "Performance & Cache"|t('commerce-sale-scheduler') }}</h2>
+
+        {{ forms.textField({
+            label: "Cache TTL (Seconds)"|t('commerce-sale-scheduler'),
+            instructions: "Duration in seconds to cache evaluated sales calculations (default 300; 0 to disable)."|t('commerce-sale-scheduler'),
+            id: 'cacheTtl',
+            name: 'settings[cacheTtl]',
+            type: 'number',
+            value: settings.cacheTtl,
+            size: 8
+        }) }}
+
+        <div class="buttons" style="margin-top:24px;">
+            <input type="submit" class="btn submit" value="{{ 'Save Settings'|t('commerce-sale-scheduler') }}">
+        </div>
+    </form>
+{% endblock %}
