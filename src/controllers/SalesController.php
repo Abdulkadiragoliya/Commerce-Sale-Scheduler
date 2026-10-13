@@ -8,6 +8,7 @@ use craft\helpers\DateTimeHelper;
 use craft\web\Controller;
 use abdulkadiragoliya\commercesalescheduler\Plugin;
 use abdulkadiragoliya\commercesalescheduler\models\Sale;
+use abdulkadiragoliya\commercesalescheduler\web\assets\cp\CpAsset;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -23,6 +24,7 @@ class SalesController extends Controller
     {
         $this->requireCpRequest();
         $this->requirePermission('commerce-sale-scheduler:manage');
+        Craft::$app->getView()->registerAssetBundle(CpAsset::class);
         return parent::beforeAction($action);
     }
 
@@ -57,6 +59,10 @@ class SalesController extends Controller
     {
         $salesService = Plugin::getInstance()->sales;
 
+        if ($id === null) {
+            $id = $this->request->getQueryParam('id') ? (int)$this->request->getQueryParam('id') : null;
+        }
+
         if ($sale === null) {
             if ($id !== null) {
                 $sale = $salesService->getSaleById($id);
@@ -74,6 +80,8 @@ class SalesController extends Controller
                 $sale->countdownEnabled = $settings->defaultCountdownEnabled;
                 $sale->countdownShowListing = $settings->defaultCountdownShowListing;
                 $sale->countdownShowDetail = $settings->defaultCountdownShowDetail;
+                $sale->countdownHeadingColor = $settings->defaultCountdownHeadingColor;
+                $sale->countdownDigitsColor = $settings->defaultCountdownDigitsColor;
                 $sale->priceShowOriginal = $settings->defaultPriceShowOriginal;
                 $sale->priceShowSavings = $settings->defaultPriceShowSavings;
                 $sale->priceShowBadge = $settings->defaultPriceShowBadge;
@@ -120,8 +128,10 @@ class SalesController extends Controller
 
         $dateFromParam = $request->getBodyParam('dateFrom');
         $dateToParam = $request->getBodyParam('dateTo');
-        $sale->dateFrom = $dateFromParam ? DateTimeHelper::toDateTime($dateFromParam) : null;
-        $sale->dateTo = $dateToParam ? DateTimeHelper::toDateTime($dateToParam) : null;
+        $parsedDateFrom = $dateFromParam ? DateTimeHelper::toDateTime($dateFromParam) : null;
+        $parsedDateTo = $dateToParam ? DateTimeHelper::toDateTime($dateToParam) : null;
+        $sale->dateFrom = ($parsedDateFrom instanceof \DateTimeInterface) ? $parsedDateFrom : null;
+        $sale->dateTo = ($parsedDateTo instanceof \DateTimeInterface) ? $parsedDateTo : null;
 
         $sale->applyToAllVariants = (bool)$request->getBodyParam('applyToAllVariants', true);
         $sale->allSites = (bool)$request->getBodyParam('allSites', true);
@@ -144,28 +154,30 @@ class SalesController extends Controller
         $sale->tagCustomClass = $request->getBodyParam('tagCustomClass');
 
         // Countdown Settings
-        $sale->countdownEnabled = (bool)$request->getBodyParam('countdownEnabled', true);
+        $sale->countdownEnabled = (bool)$request->getBodyParam('countdownEnabled', false);
         $sale->countdownStyle = (string)$request->getBodyParam('countdownStyle', 'compact');
         $sale->countdownHeading = $request->getBodyParam('countdownHeading');
         $sale->countdownShowListing = (bool)$request->getBodyParam('countdownShowListing', false);
-        $sale->countdownShowDetail = (bool)$request->getBodyParam('countdownShowDetail', true);
+        $sale->countdownShowDetail = (bool)$request->getBodyParam('countdownShowDetail', false);
+        $sale->countdownHeadingColor = $request->getBodyParam('countdownHeadingColor') ? (string)$request->getBodyParam('countdownHeadingColor') : null;
+        $sale->countdownDigitsColor = $request->getBodyParam('countdownDigitsColor') ? (string)$request->getBodyParam('countdownDigitsColor') : null;
         $sale->countdownCustomClass = $request->getBodyParam('countdownCustomClass');
 
         // Price Display Settings
-        $sale->priceShowOriginal = (bool)$request->getBodyParam('priceShowOriginal', true);
-        $sale->priceShowSavings = (bool)$request->getBodyParam('priceShowSavings', true);
-        $sale->priceShowBadge = (bool)$request->getBodyParam('priceShowBadge', true);
+        $sale->priceShowOriginal = (bool)$request->getBodyParam('priceShowOriginal', false);
+        $sale->priceShowSavings = (bool)$request->getBodyParam('priceShowSavings', false);
+        $sale->priceShowBadge = (bool)$request->getBodyParam('priceShowBadge', false);
         $sale->badgeText = $request->getBodyParam('badgeText');
 
         if (!$salesService->saveSale($sale)) {
-            $this->setFailNotification(Craft::t('commerce-sale-scheduler', 'Could not save sale.'));
+            Craft::$app->getSession()->setError(Craft::t('commerce-sale-scheduler', 'Could not save sale.'));
             Craft::$app->getUrlManager()->setRouteParams([
                 'sale' => $sale,
             ]);
             return $this->actionEdit($sale->id, $sale);
         }
 
-        $this->setSuccessNotification(Craft::t('commerce-sale-scheduler', 'Sale saved successfully.'));
+        Craft::$app->getSession()->setNotice(Craft::t('commerce-sale-scheduler', 'Sale saved successfully.'));
 
         return $this->redirectToPostedUrl($sale, 'sale-scheduler/sales');
     }
@@ -176,16 +188,16 @@ class SalesController extends Controller
     public function actionDuplicate(): Response
     {
         $this->requirePostRequest();
-        $id = (int)$this->request->getRequiredBodyParam('id');
+        $id = (int)$this->request->getRequiredParam('id');
 
         $duplicate = Plugin::getInstance()->sales->duplicateSale($id);
 
         if ($duplicate) {
-            $this->setSuccessNotification(Craft::t('commerce-sale-scheduler', 'Sale duplicated as draft.'));
-            return $this->redirect('sale-scheduler/sales/edit?id=' . $duplicate->id);
+            Craft::$app->getSession()->setNotice(Craft::t('commerce-sale-scheduler', 'Sale duplicated as draft.'));
+            return $this->redirect('sale-scheduler/sales/' . $duplicate->id);
         }
 
-        $this->setFailNotification(Craft::t('commerce-sale-scheduler', 'Could not duplicate sale.'));
+        Craft::$app->getSession()->setError(Craft::t('commerce-sale-scheduler', 'Could not duplicate sale.'));
         return $this->redirect('sale-scheduler/sales');
     }
 
@@ -195,12 +207,12 @@ class SalesController extends Controller
     public function actionDelete(): Response
     {
         $this->requirePostRequest();
-        $id = (int)$this->request->getRequiredBodyParam('id');
+        $id = (int)$this->request->getRequiredParam('id');
 
         if (Plugin::getInstance()->sales->deleteSaleById($id)) {
-            $this->setSuccessNotification(Craft::t('commerce-sale-scheduler', 'Sale deleted successfully.'));
+            Craft::$app->getSession()->setNotice(Craft::t('commerce-sale-scheduler', 'Sale deleted successfully.'));
         } else {
-            $this->setFailNotification(Craft::t('commerce-sale-scheduler', 'Could not delete sale.'));
+            Craft::$app->getSession()->setError(Craft::t('commerce-sale-scheduler', 'Could not delete sale.'));
         }
 
         return $this->redirect('sale-scheduler/sales');
@@ -212,7 +224,7 @@ class SalesController extends Controller
     public function actionToggleStatus(): Response
     {
         $this->requirePostRequest();
-        $id = (int)$this->request->getRequiredBodyParam('id');
+        $id = (int)$this->request->getRequiredParam('id');
 
         $success = Plugin::getInstance()->sales->toggleStatus($id);
 
@@ -221,9 +233,9 @@ class SalesController extends Controller
         }
 
         if ($success) {
-            $this->setSuccessNotification(Craft::t('commerce-sale-scheduler', 'Sale status updated.'));
+            Craft::$app->getSession()->setNotice(Craft::t('commerce-sale-scheduler', 'Sale status updated.'));
         } else {
-            $this->setFailNotification(Craft::t('commerce-sale-scheduler', 'Could not update status.'));
+            Craft::$app->getSession()->setError(Craft::t('commerce-sale-scheduler', 'Could not update status.'));
         }
 
         return $this->redirect('sale-scheduler/sales');
@@ -239,12 +251,12 @@ class SalesController extends Controller
         $ids = (array)$this->request->getBodyParam('ids', []);
 
         if (empty($ids)) {
-            $this->setFailNotification(Craft::t('commerce-sale-scheduler', 'No sales selected.'));
+            Craft::$app->getSession()->setError(Craft::t('commerce-sale-scheduler', 'No sales selected.'));
             return $this->redirect('sale-scheduler/sales');
         }
 
         $count = Plugin::getInstance()->sales->bulkAction($action, $ids);
-        $this->setSuccessNotification(Craft::t('commerce-sale-scheduler', '{count} sale(s) updated.', ['count' => $count]));
+        Craft::$app->getSession()->setNotice(Craft::t('commerce-sale-scheduler', '{count} sale(s) updated.', ['count' => $count]));
 
         return $this->redirect('sale-scheduler/sales');
     }

@@ -4,174 +4,246 @@
 {% set title = "Sale Scheduler Settings"|t('commerce-sale-scheduler') %}
 {% set selectedSubnavItem = 'settings' %}
 {% set fullPageForm = true %}
+{% set submitButtonLabel = 'Save Settings'|t('commerce-sale-scheduler') %}
 
 {% block content %}
-    <form method="post" action="" accept-charset="UTF-8">
-        {{ csrfInput() }}
-        {{ actionInput('commerce-sale-scheduler/settings/save') }}
-        {{ redirectInput('sale-scheduler/settings') }}
+    {{ actionInput('commerce-sale-scheduler/settings/save') }}
+    {{ redirectInput('sale-scheduler/settings') }}
 
-        <h2>{{ "Default Promotional Tag Settings"|t('commerce-sale-scheduler') }}</h2>
+        {# 1. Default Promotional Tag Settings #}
+        <div class="sale-panel">
+            <div class="sale-panel-header">
+                <div class="sale-panel-title-group">
+                    <span class="sale-panel-icon sale-panel-icon--rose">🎨</span>
+                    <div>
+                        <h3 class="sale-panel-title">{{ "Default Promotional Tag Settings"|t('commerce-sale-scheduler') }}</h3>
+                        <p class="sale-panel-subtitle">{{ "Default configuration for product image tags and badges applied to new sales."|t('commerce-sale-scheduler') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sale-panel-body">
+                <div class="sale-grid-2">
+                    {{ forms.lightswitchField({
+                        label: "Enable Tags by Default"|t('commerce-sale-scheduler'),
+                        instructions: "Whether new sales should default to displaying promotional tags."|t('commerce-sale-scheduler'),
+                        id: 'defaultTagEnabled',
+                        name: 'settings[defaultTagEnabled]',
+                        on: settings.defaultTagEnabled
+                    }) }}
 
-        <div class="flex" style="gap:20px; flex-wrap:wrap;">
-            {{ forms.lightswitchField({
-                label: "Enable Tags by Default"|t('commerce-sale-scheduler'),
-                id: 'defaultTagEnabled',
-                name: 'settings[defaultTagEnabled]',
-                on: settings.defaultTagEnabled
-            }) }}
+                    {{ forms.textField({
+                        label: "Default Tag Width / Size"|t('commerce-sale-scheduler'),
+                        instructions: "Default CSS width applied to promotional tags (e.g. 80px)."|t('commerce-sale-scheduler'),
+                        id: 'defaultTagWidth',
+                        name: 'settings[defaultTagWidth]',
+                        value: settings.defaultTagWidth
+                    }) }}
+                </div>
 
-            {{ forms.textField({
-                label: "Default Tag Width / Size"|t('commerce-sale-scheduler'),
-                id: 'defaultTagWidth',
-                name: 'settings[defaultTagWidth]',
-                value: settings.defaultTagWidth
-            }) }}
+                <div class="sale-grid-2">
+                    {{ forms.selectField({
+                        label: "Default Listing Tag Position"|t('commerce-sale-scheduler'),
+                        instructions: "Corner placement on category and listing cards."|t('commerce-sale-scheduler'),
+                        id: 'defaultTagPositionListing',
+                        name: 'settings[defaultTagPositionListing]',
+                        value: settings.defaultTagPositionListing,
+                        options: [
+                            { label: "Top Right"|t('commerce-sale-scheduler'), value: 'top-right' },
+                            { label: "Top Left"|t('commerce-sale-scheduler'), value: 'top-left' },
+                            { label: "Bottom Right"|t('commerce-sale-scheduler'), value: 'bottom-right' },
+                            { label: "Bottom Left"|t('commerce-sale-scheduler'), value: 'bottom-left' }
+                        ]
+                    }) }}
+
+                    {{ forms.selectField({
+                        label: "Default Detail Tag Position"|t('commerce-sale-scheduler'),
+                        instructions: "Corner placement on single product detail pages."|t('commerce-sale-scheduler'),
+                        id: 'defaultTagPositionDetail',
+                        name: 'settings[defaultTagPositionDetail]',
+                        value: settings.defaultTagPositionDetail,
+                        options: [
+                            { label: "Top Right"|t('commerce-sale-scheduler'), value: 'top-right' },
+                            { label: "Top Left"|t('commerce-sale-scheduler'), value: 'top-left' },
+                            { label: "Bottom Right"|t('commerce-sale-scheduler'), value: 'bottom-right' },
+                            { label: "Bottom Left"|t('commerce-sale-scheduler'), value: 'bottom-left' }
+                        ]
+                    }) }}
+                </div>
+            </div>
         </div>
 
-        <div class="flex" style="gap:20px; flex-wrap:wrap;">
-            {{ forms.selectField({
-                label: "Default Listing Tag Position"|t('commerce-sale-scheduler'),
-                id: 'defaultTagPositionListing',
-                name: 'settings[defaultTagPositionListing]',
-                value: settings.defaultTagPositionListing,
-                options: [
-                    { label: "Top Right"|t('commerce-sale-scheduler'), value: 'top-right' },
-                    { label: "Top Left"|t('commerce-sale-scheduler'), value: 'top-left' },
-                    { label: "Bottom Right"|t('commerce-sale-scheduler'), value: 'bottom-right' },
-                    { label: "Bottom Left"|t('commerce-sale-scheduler'), value: 'bottom-left' }
-                ]
-            }) }}
+        {# 2. Default Countdown Timer Settings #}
+        <div class="sale-panel">
+            <div class="sale-panel-header">
+                <div class="sale-panel-title-group">
+                    <span class="sale-panel-icon sale-panel-icon--blue">⏱️</span>
+                    <div>
+                        <h3 class="sale-panel-title">{{ "Default Countdown Timer Settings"|t('commerce-sale-scheduler') }}</h3>
+                        <p class="sale-panel-subtitle">{{ "Default behavior, visual theme, and unit labels for urgency countdown widgets."|t('commerce-sale-scheduler') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sale-panel-body">
+                <div class="sale-grid-2">
+                    {{ forms.lightswitchField({
+                        label: "Enable Countdown by Default"|t('commerce-sale-scheduler'),
+                        instructions: "Whether new sales should default to displaying a countdown timer."|t('commerce-sale-scheduler'),
+                        id: 'defaultCountdownEnabled',
+                        name: 'settings[defaultCountdownEnabled]',
+                        on: settings.defaultCountdownEnabled
+                    }) }}
 
-            {{ forms.selectField({
-                label: "Default Detail Tag Position"|t('commerce-sale-scheduler'),
-                id: 'defaultTagPositionDetail',
-                name: 'settings[defaultTagPositionDetail]',
-                value: settings.defaultTagPositionDetail,
-                options: [
-                    { label: "Top Right"|t('commerce-sale-scheduler'), value: 'top-right' },
-                    { label: "Top Left"|t('commerce-sale-scheduler'), value: 'top-left' },
-                    { label: "Bottom Right"|t('commerce-sale-scheduler'), value: 'bottom-right' },
-                    { label: "Bottom Left"|t('commerce-sale-scheduler'), value: 'bottom-left' }
-                ]
-            }) }}
+                    {{ forms.selectField({
+                        label: "Default Countdown Style"|t('commerce-sale-scheduler'),
+                        instructions: "Visual design presentation for countdown timer blocks."|t('commerce-sale-scheduler'),
+                        id: 'defaultCountdownStyle',
+                        name: 'settings[defaultCountdownStyle]',
+                        value: settings.defaultCountdownStyle,
+                        options: [
+                            { label: "Compact Style"|t('commerce-sale-scheduler'), value: 'compact' },
+                            { label: "Boxed Dark Style"|t('commerce-sale-scheduler'), value: 'boxed' },
+                            { label: "Minimal Style"|t('commerce-sale-scheduler'), value: 'minimal' }
+                        ]
+                    }) }}
+                </div>
+
+                <div class="sale-grid-2">
+                    {{ forms.colorField({
+                        label: "Default Countdown Heading Font Color"|t('commerce-sale-scheduler'),
+                        instructions: "Default font color applied to the countdown heading text and clock icon."|t('commerce-sale-scheduler'),
+                        id: 'defaultCountdownHeadingColor',
+                        name: 'settings[defaultCountdownHeadingColor]',
+                        value: settings.defaultCountdownHeadingColor
+                    }) }}
+
+                    {{ forms.colorField({
+                        label: "Default Countdown Style Font / Digits Color"|t('commerce-sale-scheduler'),
+                        instructions: "Default font color applied to timer digits, colons, and unit labels."|t('commerce-sale-scheduler'),
+                        id: 'defaultCountdownDigitsColor',
+                        name: 'settings[defaultCountdownDigitsColor]',
+                        value: settings.defaultCountdownDigitsColor
+                    }) }}
+                </div>
+
+                <div class="sale-grid-2">
+                    {{ forms.lightswitchField({
+                        label: "Show on Listings by Default"|t('commerce-sale-scheduler'),
+                        instructions: "Render countdown on storefront listing and catalog pages."|t('commerce-sale-scheduler'),
+                        id: 'defaultCountdownShowListing',
+                        name: 'settings[defaultCountdownShowListing]',
+                        on: settings.defaultCountdownShowListing
+                    }) }}
+
+                    {{ forms.lightswitchField({
+                        label: "Show on Product Detail by Default"|t('commerce-sale-scheduler'),
+                        instructions: "Render countdown above or below the add-to-cart form."|t('commerce-sale-scheduler'),
+                        id: 'defaultCountdownShowDetail',
+                        name: 'settings[defaultCountdownShowDetail]',
+                        on: settings.defaultCountdownShowDetail
+                    }) }}
+                </div>
+
+                <div class="sale-section-label">{{ "Countdown Unit Labels"|t('commerce-sale-scheduler') }}</div>
+                <div class="sale-grid-4">
+                    {{ forms.textField({
+                        label: "Days Label"|t('commerce-sale-scheduler'),
+                        id: 'primaryCountdownLabelDays',
+                        name: 'settings[primaryCountdownLabelDays]',
+                        value: settings.primaryCountdownLabelDays
+                    }) }}
+
+                    {{ forms.textField({
+                        label: "Hours Label"|t('commerce-sale-scheduler'),
+                        id: 'primaryCountdownLabelHours',
+                        name: 'settings[primaryCountdownLabelHours]',
+                        value: settings.primaryCountdownLabelHours
+                    }) }}
+
+                    {{ forms.textField({
+                        label: "Minutes Label"|t('commerce-sale-scheduler'),
+                        id: 'primaryCountdownLabelMinutes',
+                        name: 'settings[primaryCountdownLabelMinutes]',
+                        value: settings.primaryCountdownLabelMinutes
+                    }) }}
+
+                    {{ forms.textField({
+                        label: "Seconds Label"|t('commerce-sale-scheduler'),
+                        id: 'primaryCountdownLabelSeconds',
+                        name: 'settings[primaryCountdownLabelSeconds]',
+                        value: settings.primaryCountdownLabelSeconds
+                    }) }}
+                </div>
+            </div>
         </div>
 
-        <hr>
+        {# 3. Default Price Display Settings #}
+        <div class="sale-panel">
+            <div class="sale-panel-header">
+                <div class="sale-panel-title-group">
+                    <span class="sale-panel-icon sale-panel-icon--green">🏷️</span>
+                    <div>
+                        <h3 class="sale-panel-title">{{ "Default Price Display Settings"|t('commerce-sale-scheduler') }}</h3>
+                        <p class="sale-panel-subtitle">{{ "Default storefront pricing display preferences for original prices and savings badges."|t('commerce-sale-scheduler') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sale-panel-body">
+                <div class="sale-grid-3">
+                    {{ forms.lightswitchField({
+                        label: "Show Strikethrough Original Price by Default"|t('commerce-sale-scheduler'),
+                        instructions: "Display struck-through original unit price."|t('commerce-sale-scheduler'),
+                        id: 'defaultPriceShowOriginal',
+                        name: 'settings[defaultPriceShowOriginal]',
+                        on: settings.defaultPriceShowOriginal
+                    }) }}
 
-        <h2>{{ "Default Countdown Timer Settings"|t('commerce-sale-scheduler') }}</h2>
+                    {{ forms.lightswitchField({
+                        label: "Show Savings Amount by Default"|t('commerce-sale-scheduler'),
+                        instructions: "Display calculated savings amount and percentage."|t('commerce-sale-scheduler'),
+                        id: 'defaultPriceShowSavings',
+                        name: 'settings[defaultPriceShowSavings]',
+                        on: settings.defaultPriceShowSavings
+                    }) }}
 
-        <div class="flex" style="gap:20px; flex-wrap:wrap;">
-            {{ forms.lightswitchField({
-                label: "Enable Countdown by Default"|t('commerce-sale-scheduler'),
-                id: 'defaultCountdownEnabled',
-                name: 'settings[defaultCountdownEnabled]',
-                on: settings.defaultCountdownEnabled
-            }) }}
-
-            {{ forms.selectField({
-                label: "Default Countdown Style"|t('commerce-sale-scheduler'),
-                id: 'defaultCountdownStyle',
-                name: 'settings[defaultCountdownStyle]',
-                value: settings.defaultCountdownStyle,
-                options: [
-                    { label: "Compact Style"|t('commerce-sale-scheduler'), value: 'compact' },
-                    { label: "Boxed Dark Style"|t('commerce-sale-scheduler'), value: 'boxed' },
-                    { label: "Minimal Style"|t('commerce-sale-scheduler'), value: 'minimal' }
-                ]
-            }) }}
+                    {{ forms.lightswitchField({
+                        label: "Show Promo Badge by Default"|t('commerce-sale-scheduler'),
+                        instructions: "Display 'Save X%' or custom promo badge."|t('commerce-sale-scheduler'),
+                        id: 'defaultPriceShowBadge',
+                        name: 'settings[defaultPriceShowBadge]',
+                        on: settings.defaultPriceShowBadge
+                    }) }}
+                </div>
+            </div>
         </div>
 
-        <div class="flex" style="gap:20px; flex-wrap:wrap;">
-            {{ forms.lightswitchField({
-                label: "Show Countdown on Listings by Default"|t('commerce-sale-scheduler'),
-                id: 'defaultCountdownShowListing',
-                name: 'settings[defaultCountdownShowListing]',
-                on: settings.defaultCountdownShowListing
-            }) }}
-
-            {{ forms.lightswitchField({
-                label: "Show Countdown on Product Detail by Default"|t('commerce-sale-scheduler'),
-                id: 'defaultCountdownShowDetail',
-                name: 'settings[defaultCountdownShowDetail]',
-                on: settings.defaultCountdownShowDetail
-            }) }}
+        {# 4. Performance, Cache & Invalidation #}
+        <div class="sale-panel">
+            <div class="sale-panel-header">
+                <div class="sale-panel-title-group">
+                    <span class="sale-panel-icon sale-panel-icon--amber">⚡</span>
+                    <div>
+                        <h3 class="sale-panel-title">{{ "Performance & Cache Configuration"|t('commerce-sale-scheduler') }}</h3>
+                        <p class="sale-panel-subtitle">{{ "Optimize storefront speed by caching resolved product eligibility and calculations."|t('commerce-sale-scheduler') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="sale-panel-body">
+                <div class="sale-grid-2">
+                    {{ forms.textField({
+                        label: "Cache TTL (Seconds)"|t('commerce-sale-scheduler'),
+                        instructions: "Duration in seconds to cache evaluated sales calculations (default: 300; set 0 to disable during development)."|t('commerce-sale-scheduler'),
+                        id: 'cacheDuration',
+                        name: 'settings[cacheDuration]',
+                        type: 'number',
+                        value: settings.cacheDuration
+                    }) }}
+                </div>
+            </div>
         </div>
 
-        <h3>{{ "Countdown Unit Labels"|t('commerce-sale-scheduler') }}</h3>
-        <div class="flex" style="gap:16px; flex-wrap:wrap;">
-            {{ forms.textField({
-                label: "Days Label"|t('commerce-sale-scheduler'),
-                name: 'settings[primaryCountdownLabelDays]',
-                value: settings.primaryCountdownLabelDays,
-                size: 8
-            }) }}
-
-            {{ forms.textField({
-                label: "Hours Label"|t('commerce-sale-scheduler'),
-                name: 'settings[primaryCountdownLabelHours]',
-                value: settings.primaryCountdownLabelHours,
-                size: 8
-            }) }}
-
-            {{ forms.textField({
-                label: "Minutes Label"|t('commerce-sale-scheduler'),
-                name: 'settings[primaryCountdownLabelMinutes]',
-                value: settings.primaryCountdownLabelMinutes,
-                size: 8
-            }) }}
-
-            {{ forms.textField({
-                label: "Seconds Label"|t('commerce-sale-scheduler'),
-                name: 'settings[primaryCountdownLabelSeconds]',
-                value: settings.primaryCountdownLabelSeconds,
-                size: 8
-            }) }}
+        {# Form Actions #}
+        <div class="sale-form-actions">
+            <input type="submit" class="btn submit big" value="{{ 'Save Settings'|t('commerce-sale-scheduler') }}">
+            <a href="{{ cpUrl('sale-scheduler/dashboard') }}" class="btn big">{{ 'Back to Dashboard'|t('commerce-sale-scheduler') }}</a>
         </div>
-
-        <hr>
-
-        <h2>{{ "Default Price Display Settings"|t('commerce-sale-scheduler') }}</h2>
-
-        <div class="flex" style="gap:20px; flex-wrap:wrap;">
-            {{ forms.lightswitchField({
-                label: "Show Strikethrough Original Price by Default"|t('commerce-sale-scheduler'),
-                id: 'defaultPriceShowOriginal',
-                name: 'settings[defaultPriceShowOriginal]',
-                on: settings.defaultPriceShowOriginal
-            }) }}
-
-            {{ forms.lightswitchField({
-                label: "Show Savings Amount by Default"|t('commerce-sale-scheduler'),
-                id: 'defaultPriceShowSavings',
-                name: 'settings[defaultPriceShowSavings]',
-                on: settings.defaultPriceShowSavings
-            }) }}
-
-            {{ forms.lightswitchField({
-                label: "Show Promo Badge by Default"|t('commerce-sale-scheduler'),
-                id: 'defaultPriceShowBadge',
-                name: 'settings[defaultPriceShowBadge]',
-                on: settings.defaultPriceShowBadge
-            }) }}
-        </div>
-
-        <hr>
-
-        <h2>{{ "Performance & Cache"|t('commerce-sale-scheduler') }}</h2>
-
-        {{ forms.textField({
-            label: "Cache TTL (Seconds)"|t('commerce-sale-scheduler'),
-            instructions: "Duration in seconds to cache evaluated sales calculations (default 300; 0 to disable)."|t('commerce-sale-scheduler'),
-            id: 'cacheTtl',
-            name: 'settings[cacheTtl]',
-            type: 'number',
-            value: settings.cacheTtl,
-            size: 8
-        }) }}
-
-        <div class="buttons" style="margin-top:24px;">
-            <input type="submit" class="btn submit" value="{{ 'Save Settings'|t('commerce-sale-scheduler') }}">
-        </div>
-    </form>
 {% endblock %}

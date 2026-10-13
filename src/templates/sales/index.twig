@@ -9,110 +9,175 @@
 
 {% block content %}
     {# Search & Filter Toolbar #}
-    <div class="toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
-        <form method="get" action="" style="display:flex; gap:10px; align-items:center;">
-            <div class="texticon search icon">
-                <input type="text" name="search" value="{{ search }}" class="text" placeholder="{{ 'Search sales…'|t('commerce-sale-scheduler') }}" />
-            </div>
+    <div class="sale-panel" style="margin-bottom: 20px;">
+        <div class="sale-panel-body" style="padding: 16px 20px;">
+            <form method="get" action="{{ cpUrl('sale-scheduler/sales') }}" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; flex-grow:1;">
+                    <div class="texticon search icon" style="min-width:240px;">
+                        <input type="text" name="search" value="{{ search }}" class="text fullwidth" placeholder="{{ 'Search sales by name or description…'|t('commerce-sale-scheduler') }}" />
+                    </div>
 
-            <div class="select">
-                <select name="status" onchange="this.form.submit()">
-                    <option value="all" {{ status == 'all' ? 'selected' : '' }}>{{ "All Statuses"|t('commerce-sale-scheduler') }}</option>
-                    <option value="active" {{ status == 'active' ? 'selected' : '' }}>{{ "Active"|t('commerce-sale-scheduler') }}</option>
-                    <option value="scheduled" {{ status == 'scheduled' ? 'selected' : '' }}>{{ "Scheduled"|t('commerce-sale-scheduler') }}</option>
-                    <option value="expired" {{ status == 'expired' ? 'selected' : '' }}>{{ "Expired"|t('commerce-sale-scheduler') }}</option>
-                    <option value="disabled" {{ status == 'disabled' ? 'selected' : '' }}>{{ "Disabled"|t('commerce-sale-scheduler') }}</option>
-                </select>
-            </div>
+                    <div class="select">
+                        <select name="status" onchange="this.form.submit()">
+                            <option value="all" {{ status == 'all' ? 'selected' : '' }}>{{ "All Statuses"|t('commerce-sale-scheduler') }}</option>
+                            <option value="active" {{ status == 'active' ? 'selected' : '' }}>{{ "Active"|t('commerce-sale-scheduler') }}</option>
+                            <option value="scheduled" {{ status == 'scheduled' ? 'selected' : '' }}>{{ "Scheduled"|t('commerce-sale-scheduler') }}</option>
+                            <option value="expired" {{ status == 'expired' ? 'selected' : '' }}>{{ "Expired"|t('commerce-sale-scheduler') }}</option>
+                            <option value="disabled" {{ status == 'disabled' ? 'selected' : '' }}>{{ "Disabled"|t('commerce-sale-scheduler') }}</option>
+                        </select>
+                    </div>
 
-            <input type="submit" class="btn" value="{{ 'Filter'|t('commerce-sale-scheduler') }}" />
+                    <button type="submit" class="btn">{{ 'Filter'|t('commerce-sale-scheduler') }}</button>
+
+                    {% if search or (status and status != 'all') %}
+                        <a href="{{ cpUrl('sale-scheduler/sales') }}" class="btn dashed">{{ "Reset"|t('commerce-sale-scheduler') }}</a>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <a href="{{ cpUrl('sale-scheduler/dashboard') }}" class="btn small">{{ "View Dashboard"|t('commerce-sale-scheduler') }}</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Bulk Actions & Sales Table #}
+    <div class="sale-panel">
+        <form method="post" action="" id="sales-form" onsubmit="return handleBulkAction(this);">
+            {{ csrfInput() }}
+            {{ actionInput('commerce-sale-scheduler/sales/bulk-action') }}
+
+            {% if sales|length %}
+                <div class="sale-panel-header" style="background:#fff; border-bottom:1px solid #e2e8f0;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span class="light" style="font-size:13px; font-weight:600;">{{ "{count} Sales Found"|t('commerce-sale-scheduler', { count: sales|length }) }}</span>
+                    </div>
+
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <div class="select small">
+                            <select name="bulkAction">
+                                <option value="">{{ "Bulk Actions…"|t('commerce-sale-scheduler') }}</option>
+                                <option value="enable">{{ "Enable Selected"|t('commerce-sale-scheduler') }}</option>
+                                <option value="disable">{{ "Disable Selected"|t('commerce-sale-scheduler') }}</option>
+                                <option value="duplicate">{{ "Duplicate Selected"|t('commerce-sale-scheduler') }}</option>
+                                <option value="delete">{{ "Delete Selected"|t('commerce-sale-scheduler') }}</option>
+                            </select>
+                        </div>
+                        <input type="submit" class="btn small" value="{{ 'Apply'|t('commerce-sale-scheduler') }}" />
+                    </div>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="data fullwidth" id="sales-table" style="margin:0;">
+                        <thead>
+                            <tr>
+                                <th style="width:28px; text-align:center;">
+                                    <input type="checkbox" id="select-all" onclick="var c=document.querySelectorAll('.sale-cb'); for(var i=0;i<c.length;i++) c[i].checked=this.checked;" title="{{ 'Select all'|t('commerce-sale-scheduler') }}" />
+                                </th>
+                                <th scope="col">{{ "Sale Name"|t('commerce-sale-scheduler') }}</th>
+                                <th scope="col">{{ "Status"|t('commerce-sale-scheduler') }}</th>
+                                <th scope="col">{{ "Discount"|t('commerce-sale-scheduler') }}</th>
+                                <th scope="col">{{ "Schedule"|t('commerce-sale-scheduler') }}</th>
+                                <th scope="col">{{ "Priority"|t('commerce-sale-scheduler') }}</th>
+                                <th scope="col" style="text-align:right;">{{ "Actions"|t('commerce-sale-scheduler') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales %}
+                                {% set s = sale.getStatus() %}
+                                <tr>
+                                    <td style="text-align:center;">
+                                        <input type="checkbox" name="ids[]" value="{{ sale.id }}" class="sale-cb" />
+                                    </td>
+                                    <td>
+                                        <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}" style="font-weight:600; color:#0f172a; text-decoration:none;">
+                                            {{ sale.name }}
+                                        </a>
+                                        {% if sale.description %}
+                                            <div class="light" style="font-size:12px; margin-top:2px;">{{ sale.description|slice(0, 80) }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="sale-status-badge sale-status-badge--{{ s }}">
+                                            {{ sale.getStatusLabel() }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span style="display:inline-block; font-weight:700; background:#f1f5f9; padding:3px 8px; border-radius:6px; font-size:13px; color:#0f172a;">
+                                            {{ sale.getFormattedDiscount() }}
+                                        </span>
+                                    </td>
+                                    <td class="light" style="font-size:12px;">
+                                        {% if sale.dateFrom or sale.dateTo %}
+                                            <div><strong>{{ sale.dateFrom ? sale.dateFrom|date('short') : 'Immediate' }}</strong> &rarr; <strong>{{ sale.dateTo ? sale.dateTo|date('short') : 'Ongoing' }}</strong></div>
+                                        {% else %}
+                                            <span class="light">{{ "Always active"|t('commerce-sale-scheduler') }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge" style="font-size:11px;">{{ sale.priority }}</span>
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <div style="display:inline-flex; gap:6px;">
+                                            <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}" class="btn small">{{ "Edit"|t('commerce-sale-scheduler') }}</a>
+
+                                            <button type="button" class="btn small" onclick="submitRowAction('{{ actionUrl('commerce-sale-scheduler/sales/duplicate') }}', {{ sale.id }});" title="{{ 'Duplicate Sale'|t('commerce-sale-scheduler') }}">
+                                                {{ "Duplicate"|t('commerce-sale-scheduler') }}
+                                            </button>
+
+                                            <button type="button" class="btn small error" onclick="submitRowAction('{{ actionUrl('commerce-sale-scheduler/sales/delete') }}', {{ sale.id }}, '{{ 'Are you sure you want to permanently delete this sale?'|t('commerce-sale-scheduler')|e('js') }}');" title="{{ 'Delete Sale'|t('commerce-sale-scheduler') }}">
+                                                {{ "Delete"|t('commerce-sale-scheduler') }}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty" style="text-align:center; padding:50px 20px;">
+                    <div style="font-size:36px; margin-bottom:12px;">🏷️</div>
+                    <h3 style="font-size:16px; font-weight:600; color:#334155; margin-bottom:6px;">{{ "No sales found"|t('commerce-sale-scheduler') }}</h3>
+                    <p class="light" style="font-size:13px; margin-bottom:16px;">{{ "No scheduled sales matched your search or status filter."|t('commerce-sale-scheduler') }}</p>
+                    <a href="{{ cpUrl('sale-scheduler/sales/new') }}" class="btn submit add icon">{{ "Create New Sale"|t('commerce-sale-scheduler') }}</a>
+                </div>
+            {% endif %}
+        </form>
+
+        {# Standalone row action form for Duplicate and Delete #}
+        <form method="post" id="row-action-form" style="display:none;">
+            {{ csrfInput() }}
+            <input type="hidden" name="id" id="row-action-id" value="" />
         </form>
     </div>
 
-    {# Bulk Actions Form & Table #}
-    <form method="post" action="" id="sales-form">
-        {{ csrfInput() }}
-        {{ actionInput('commerce-sale-scheduler/sales/bulk-action') }}
+    {% js %}
+    window.handleBulkAction = function(form) {
+        var act = form.querySelector('select[name=bulkAction]').value;
+        if (!act) {
+            alert('{{ "Please choose a bulk action from the dropdown first."|t('commerce-sale-scheduler')|e('js') }}');
+            return false;
+        }
+        var checked = form.querySelectorAll('.sale-cb:checked');
+        if (!checked.length) {
+            alert('{{ "Please select at least one sale using the checkboxes."|t('commerce-sale-scheduler')|e('js') }}');
+            return false;
+        }
+        if (act === 'delete') {
+            return confirm('{{ "Are you sure you want to permanently delete the selected sales?"|t('commerce-sale-scheduler')|e('js') }}');
+        }
+        return confirm('{{ "Are you sure you want to perform this action on the selected sales?"|t('commerce-sale-scheduler')|e('js') }}');
+    };
 
-        {% if sales|length %}
-            <div style="margin-bottom:12px; display:flex; gap:8px; align-items:center;">
-                <div class="select">
-                    <select name="bulkAction">
-                        <option value="">{{ "Bulk Actions…"|t('commerce-sale-scheduler') }}</option>
-                        <option value="enable">{{ "Enable Selected"|t('commerce-sale-scheduler') }}</option>
-                        <option value="disable">{{ "Disable Selected"|t('commerce-sale-scheduler') }}</option>
-                        <option value="delete">{{ "Delete Selected"|t('commerce-sale-scheduler') }}</option>
-                    </select>
-                </div>
-                <input type="submit" class="btn" value="{{ 'Apply'|t('commerce-sale-scheduler') }}" onclick="return confirm('{{ 'Are you sure you want to perform this action on selected sales?'|t('commerce-sale-scheduler') }}');" />
-            </div>
-
-            <table class="data fullwidth" id="sales-table">
-                <thead>
-                    <tr>
-                        <th style="width:20px;">
-                            <input type="checkbox" id="select-all" onclick="var c=document.querySelectorAll('.sale-cb'); for(var i=0;i<c.length;i++) c[i].checked=this.checked;" />
-                        </th>
-                        <th scope="col">{{ "Sale Name"|t('commerce-sale-scheduler') }}</th>
-                        <th scope="col">{{ "Status"|t('commerce-sale-scheduler') }}</th>
-                        <th scope="col">{{ "Discount"|t('commerce-sale-scheduler') }}</th>
-                        <th scope="col">{{ "Schedule"|t('commerce-sale-scheduler') }}</th>
-                        <th scope="col">{{ "Priority"|t('commerce-sale-scheduler') }}</th>
-                        <th scope="col" style="text-align:right;">{{ "Actions"|t('commerce-sale-scheduler') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for sale in sales %}
-                        {% set s = sale.getStatus() %}
-                        <tr>
-                            <td>
-                                <input type="checkbox" name="ids[]" value="{{ sale.id }}" class="sale-cb" />
-                            </td>
-                            <td>
-                                <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}"><strong>{{ sale.name }}</strong></a>
-                                {% if sale.description %}
-                                    <div class="light" style="font-size:12px;">{{ sale.description|slice(0, 70) }}</div>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="status {{ s == 'active' ? 'green' : (s == 'scheduled' ? 'blue' : (s == 'expired' ? 'disabled' : 'red')) }}"></span>
-                                {{ sale.getStatusLabel() }}
-                            </td>
-                            <td>
-                                <code>{{ sale.getFormattedDiscount() }}</code>
-                            </td>
-                            <td class="light" style="font-size:12px;">
-                                {% if sale.dateFrom or sale.dateTo %}
-                                    {{ sale.dateFrom ? sale.dateFrom|date('short') : 'Anytime' }} &rarr; {{ sale.dateTo ? sale.dateTo|date('short') : 'Ongoing' }}
-                                {% else %}
-                                    {{ "Always active"|t('commerce-sale-scheduler') }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {{ sale.priority }}
-                            </td>
-                            <td style="text-align:right;">
-                                <div style="display:inline-flex; gap:6px;">
-                                    <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}" class="btn small">{{ "Edit"|t('commerce-sale-scheduler') }}</a>
-                                    
-                                    <button type="submit" formaction="{{ actionUrl('commerce-sale-scheduler/sales/duplicate', { id: sale.id }) }}" class="btn small">
-                                        {{ "Duplicate"|t('commerce-sale-scheduler') }}
-                                    </button>
-
-                                    <button type="submit" formaction="{{ actionUrl('commerce-sale-scheduler/sales/delete', { id: sale.id }) }}" class="btn small error" onclick="return confirm('{{ 'Are you sure you want to delete this sale?'|t('commerce-sale-scheduler') }}');">
-                                        {{ "Delete"|t('commerce-sale-scheduler') }}
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="empty" style="text-align:center; padding:40px 20px;">
-                <p class="light" style="font-size:15px; margin-bottom:12px;">{{ "No sales found matching your criteria."|t('commerce-sale-scheduler') }}</p>
-                <a href="{{ cpUrl('sale-scheduler/sales/new') }}" class="btn submit">{{ "Create New Sale"|t('commerce-sale-scheduler') }}</a>
-            </div>
-        {% endif %}
-    </form>
+    window.submitRowAction = function(actionUrl, id, confirmMessage) {
+        if (confirmMessage && !confirm(confirmMessage)) {
+            return false;
+        }
+        var form = document.getElementById('row-action-form');
+        form.action = actionUrl;
+        document.getElementById('row-action-id').value = id;
+        form.submit();
+    };
+    {% endjs %}
 {% endblock %}

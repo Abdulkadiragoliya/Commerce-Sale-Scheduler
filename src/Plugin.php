@@ -19,6 +19,7 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\services\Elements;
 use craft\services\UserPermissions;
 use craft\web\twig\variables\Cp;
+use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use abdulkadiragoliya\commercesalescheduler\adjusters\SaleAdjuster;
 use abdulkadiragoliya\commercesalescheduler\models\Settings;
@@ -28,6 +29,7 @@ use abdulkadiragoliya\commercesalescheduler\services\DiscountEngine;
 use abdulkadiragoliya\commercesalescheduler\services\Eligibility;
 use abdulkadiragoliya\commercesalescheduler\services\Sales;
 use abdulkadiragoliya\commercesalescheduler\services\TagManager;
+use abdulkadiragoliya\commercesalescheduler\variables\SaleSchedulerVariable;
 use abdulkadiragoliya\commercesalescheduler\web\twig\Extension;
 use yii\base\Event;
 
@@ -70,6 +72,17 @@ class Plugin extends BasePlugin
         // Register Twig Extension
         Craft::$app->getView()->registerTwigExtension(new Extension());
 
+        // Register craft.saleScheduler Twig variable
+        Event::on(
+            CraftVariable::class,
+            CraftVariable::EVENT_INIT,
+            function (Event $event) {
+                /** @var CraftVariable $variable */
+                $variable = $event->sender;
+                $variable->set('saleScheduler', SaleSchedulerVariable::class);
+            }
+        );
+
         // Register CP URL rules
         Event::on(
             UrlManager::class,
@@ -83,33 +96,14 @@ class Plugin extends BasePlugin
                 $event->rules['sale-scheduler/sales/<id:\d+>'] = 'commerce-sale-scheduler/sales/edit';
                 $event->rules['sale-scheduler/sales/edit'] = 'commerce-sale-scheduler/sales/edit';
                 $event->rules['sale-scheduler/settings'] = 'commerce-sale-scheduler/settings/index';
-            }
-        );
 
-        // Register CP Navigation
-        Event::on(
-            Cp::class,
-            Cp::EVENT_REGISTER_CP_NAV_ITEMS,
-            function (RegisterCpNavItemsEvent $event) {
-                $event->navItems[] = [
-                    'url' => 'sale-scheduler',
-                    'label' => Craft::t('commerce-sale-scheduler', 'Sale Scheduler'),
-                    'fontIcon' => 'calendar',
-                    'subnav' => [
-                        'dashboard' => [
-                            'label' => Craft::t('commerce-sale-scheduler', 'Dashboard'),
-                            'url' => 'sale-scheduler/dashboard',
-                        ],
-                        'sales' => [
-                            'label' => Craft::t('commerce-sale-scheduler', 'Sales'),
-                            'url' => 'sale-scheduler/sales',
-                        ],
-                        'settings' => [
-                            'label' => Craft::t('commerce-sale-scheduler', 'Settings'),
-                            'url' => 'sale-scheduler/settings',
-                        ],
-                    ],
-                ];
+                // Also register commerce-sale-scheduler aliases
+                $event->rules['commerce-sale-scheduler'] = 'commerce-sale-scheduler/dashboard/index';
+                $event->rules['commerce-sale-scheduler/dashboard'] = 'commerce-sale-scheduler/dashboard/index';
+                $event->rules['commerce-sale-scheduler/sales'] = 'commerce-sale-scheduler/sales/index';
+                $event->rules['commerce-sale-scheduler/sales/new'] = 'commerce-sale-scheduler/sales/edit';
+                $event->rules['commerce-sale-scheduler/sales/<id:\d+>'] = 'commerce-sale-scheduler/sales/edit';
+                $event->rules['commerce-sale-scheduler/settings'] = 'commerce-sale-scheduler/settings/index';
             }
         );
 
@@ -147,7 +141,11 @@ class Plugin extends BasePlugin
                     if ($sale) {
                         $calc = $this->discounts->calculate((float)$lineItem->price, $sale);
                         if ($calc->isSaleApplied) {
-                            $lineItem->setPromotionalPrice($calc->salePrice);
+                            if (method_exists($lineItem, 'setPromotionalPrice')) {
+                                $lineItem->setPromotionalPrice($calc->salePrice);
+                            } elseif (method_exists($lineItem, 'setSalePrice')) {
+                                $lineItem->setSalePrice($calc->salePrice);
+                            }
                             $snapshot = $lineItem->getSnapshot();
                             $snapshot['salescheduler_sale_id'] = $sale->id;
                             $snapshot['salescheduler_sale_name'] = $sale->name;
@@ -175,6 +173,9 @@ class Plugin extends BasePlugin
     {
         $item = parent::getCpNavItem();
         if ($item) {
+            $item['label'] = Craft::t('commerce-sale-scheduler', 'Sale Scheduler');
+            $item['url'] = 'sale-scheduler';
+            $item['fontIcon'] = 'calendar';
             $item['subnav'] = [
                 'dashboard' => ['label' => Craft::t('commerce-sale-scheduler', 'Dashboard'), 'url' => 'sale-scheduler/dashboard'],
                 'sales' => ['label' => Craft::t('commerce-sale-scheduler', 'Sales'), 'url' => 'sale-scheduler/sales'],

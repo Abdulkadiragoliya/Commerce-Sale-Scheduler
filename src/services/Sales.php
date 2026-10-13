@@ -179,6 +179,8 @@ class Sales extends Component
         $record->countdownHeading = $sale->countdownHeading;
         $record->countdownShowListing = $sale->countdownShowListing;
         $record->countdownShowDetail = $sale->countdownShowDetail;
+        $record->countdownHeadingColor = $sale->countdownHeadingColor;
+        $record->countdownDigitsColor = $sale->countdownDigitsColor;
         $record->countdownCustomClass = $sale->countdownCustomClass;
         $record->priceShowOriginal = $sale->priceShowOriginal;
         $record->priceShowSavings = $sale->priceShowSavings;
@@ -290,6 +292,10 @@ class Sales extends Component
             $id = (int)$id;
             if ($action === 'delete') {
                 if ($this->deleteSaleById($id)) {
+                    $affected++;
+                }
+            } elseif ($action === 'duplicate') {
+                if ($this->duplicateSale($id)) {
                     $affected++;
                 }
             } elseif ($action === 'enable') {
@@ -431,6 +437,8 @@ class Sales extends Component
         $sale->countdownHeading = $record->countdownHeading;
         $sale->countdownShowListing = (bool)$record->countdownShowListing;
         $sale->countdownShowDetail = (bool)$record->countdownShowDetail;
+        $sale->countdownHeadingColor = $record->countdownHeadingColor;
+        $sale->countdownDigitsColor = $record->countdownDigitsColor;
         $sale->countdownCustomClass = $record->countdownCustomClass;
         $sale->priceShowOriginal = (bool)$record->priceShowOriginal;
         $sale->priceShowSavings = (bool)$record->priceShowSavings;

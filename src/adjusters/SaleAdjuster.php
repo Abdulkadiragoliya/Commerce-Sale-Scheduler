@@ -37,15 +37,27 @@ class SaleAdjuster extends Component implements AdjusterInterface
             if ($sale) {
                 $calculation = Plugin::getInstance()->discounts->calculate((float)$lineItem->price, $sale);
                 if ($calculation->isSaleApplied) {
-                    $lineItem->setPromotionalPrice($calculation->salePrice);
+                    if (method_exists($lineItem, 'setPromotionalPrice')) {
+                        $lineItem->setPromotionalPrice($calculation->salePrice);
+                    } elseif (method_exists($lineItem, 'setSalePrice')) {
+                        $lineItem->setSalePrice($calculation->salePrice);
+                    }
                 } else {
-                    $lineItem->setPromotionalPrice(null);
+                    if (method_exists($lineItem, 'setPromotionalPrice')) {
+                        $lineItem->setPromotionalPrice(null);
+                    } elseif (method_exists($lineItem, 'setSalePrice')) {
+                        $lineItem->setSalePrice($lineItem->price);
+                    }
                 }
             } else {
                 // If there was a scheduled promotional price and no active sale remains, revert it
                 $snapshot = $lineItem->getSnapshot();
                 if (!empty($snapshot['salescheduler_sale_id'])) {
-                    $lineItem->setPromotionalPrice(null);
+                    if (method_exists($lineItem, 'setPromotionalPrice')) {
+                        $lineItem->setPromotionalPrice(null);
+                    } elseif (method_exists($lineItem, 'setSalePrice')) {
+                        $lineItem->setSalePrice($lineItem->price);
+                    }
                 }
             }
         }

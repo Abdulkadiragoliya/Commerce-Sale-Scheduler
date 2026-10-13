@@ -219,9 +219,8 @@ class Eligibility extends Component
 
         if ($sale->applyToAllVariants) {
             if (!empty($productIds)) {
-                $variantCount = (int)(new Query())
-                    ->from('{{%commerce_variants}}')
-                    ->where(['productId' => $productIds])
+                $variantCount = (int)\craft\commerce\elements\Variant::find()
+                    ->productId($productIds)
                     ->count();
             }
         } else {

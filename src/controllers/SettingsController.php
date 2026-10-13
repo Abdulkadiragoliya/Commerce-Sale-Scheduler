@@ -6,6 +6,7 @@ namespace abdulkadiragoliya\commercesalescheduler\controllers;
 use Craft;
 use craft\web\Controller;
 use abdulkadiragoliya\commercesalescheduler\Plugin;
+use abdulkadiragoliya\commercesalescheduler\web\assets\cp\CpAsset;
 use yii\web\Response;
 
 /**
@@ -20,6 +21,7 @@ class SettingsController extends Controller
     {
         $this->requireCpRequest();
         $this->requirePermission('commerce-sale-scheduler:manage');
+        Craft::$app->getView()->registerAssetBundle(CpAsset::class);
         return parent::beforeAction($action);
     }
 
@@ -45,13 +47,13 @@ class SettingsController extends Controller
         $params = (array)$this->request->getBodyParam('settings', []);
 
         if (!Craft::$app->getPlugins()->savePluginSettings(Plugin::getInstance(), $params)) {
-            $this->setFailNotification(Craft::t('commerce-sale-scheduler', 'Could not save settings.'));
+            Craft::$app->getSession()->setError(Craft::t('commerce-sale-scheduler', 'Could not save settings.'));
             return $this->renderTemplate('commerce-sale-scheduler/settings/index', [
                 'settings' => Plugin::getInstance()->getSettings(),
             ]);
         }
 
-        $this->setSuccessNotification(Craft::t('commerce-sale-scheduler', 'Settings saved successfully.'));
+        Craft::$app->getSession()->setNotice(Craft::t('commerce-sale-scheduler', 'Settings saved successfully.'));
         return $this->redirectToPostedUrl(null, 'sale-scheduler/settings');
     }
 }

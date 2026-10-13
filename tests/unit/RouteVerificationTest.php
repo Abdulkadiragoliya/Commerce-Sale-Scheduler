@@ -81,4 +81,21 @@ class RouteVerificationTest extends TestCase
         $this->assertStringContains('Sale Scheduler Settings', $settingsHtml);
         $this->assertStringContains('Default Promotional Tag Settings', $settingsHtml);
     }
+
+    public function testCpNavigationIntegrity(): void
+    {
+        $plugin = \abdulkadiragoliya\commercesalescheduler\Plugin::getInstance();
+        $navItem = $plugin->getCpNavItem();
+
+        $this->assertNotNull($navItem, 'CP Nav item must exist');
+        $this->assertEquals('Sale Scheduler', $navItem['label']);
+        $this->assertEquals('sale-scheduler', $navItem['url']);
+        $this->assertTrue(isset($navItem['subnav']));
+        $this->assertTrue(isset($navItem['subnav']['dashboard']));
+        $this->assertTrue(isset($navItem['subnav']['sales']));
+        $this->assertTrue(isset($navItem['subnav']['settings']));
+        $this->assertEquals('sale-scheduler/dashboard', $navItem['subnav']['dashboard']['url']);
+        $this->assertEquals('sale-scheduler/sales', $navItem['subnav']['sales']['url']);
+        $this->assertEquals('sale-scheduler/settings', $navItem['subnav']['settings']['url']);
+    }
 }

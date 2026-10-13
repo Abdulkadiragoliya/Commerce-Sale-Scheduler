@@ -18,6 +18,8 @@ class Settings extends Model
     public bool $defaultCountdownEnabled = true;
     public bool $defaultCountdownShowListing = false;
     public bool $defaultCountdownShowDetail = true;
+    public ?string $defaultCountdownHeadingColor = null;
+    public ?string $defaultCountdownDigitsColor = null;
     public bool $defaultPriceShowOriginal = true;
     public bool $defaultPriceShowSavings = true;
     public bool $defaultPriceShowBadge = true;
@@ -38,6 +40,7 @@ class Settings extends Model
             [['defaultCountdownStyle'], 'in', 'range' => ['compact', 'boxed', 'minimal']],
             [['defaultTagPositionListing', 'defaultTagPositionDetail'], 'in', 'range' => ['top-left', 'top-right', 'bottom-left', 'bottom-right']],
             [['defaultTagWidth'], 'string', 'max' => 32],
+            [['defaultCountdownHeadingColor', 'defaultCountdownDigitsColor'], 'string', 'max' => 32],
             [['defaultTagEnabled', 'defaultCountdownEnabled', 'defaultCountdownShowListing', 'defaultCountdownShowDetail', 'defaultPriceShowOriginal', 'defaultPriceShowSavings', 'defaultPriceShowBadge', 'enableListingTimers'], 'boolean'],
             [['cacheTtl'], 'integer', 'min' => 0],
             [['primaryCountdownLabelDays', 'primaryCountdownLabelHours', 'primaryCountdownLabelMinutes', 'primaryCountdownLabelSeconds'], 'string', 'max' => 32],

@@ -78,6 +78,8 @@ class Install extends Migration
             'countdownHeading' => $this->string(255),
             'countdownShowListing' => $this->boolean()->defaultValue(false)->notNull(),
             'countdownShowDetail' => $this->boolean()->defaultValue(true)->notNull(),
+            'countdownHeadingColor' => $this->string(32),
+            'countdownDigitsColor' => $this->string(32),
             'countdownCustomClass' => $this->string(255),
             'priceShowOriginal' => $this->boolean()->defaultValue(true)->notNull(),
             'priceShowSavings' => $this->boolean()->defaultValue(true)->notNull(),

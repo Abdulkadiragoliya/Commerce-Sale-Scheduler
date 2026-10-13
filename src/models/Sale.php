@@ -63,6 +63,8 @@ class Sale extends Model
     public ?string $countdownHeading = null;
     public bool $countdownShowListing = false;
     public bool $countdownShowDetail = true;
+    public ?string $countdownHeadingColor = null;
+    public ?string $countdownDigitsColor = null;
     public ?string $countdownCustomClass = null;
 
     public bool $priceShowOriginal = true;
@@ -93,6 +95,7 @@ class Sale extends Model
             ['countdownStyle', 'in', 'range' => ['compact', 'boxed', 'minimal']],
             [['tagWidth'], 'string', 'max' => 32],
             [['tagText', 'badgeText'], 'string', 'max' => 100],
+            [['countdownHeadingColor', 'countdownDigitsColor'], 'string', 'max' => 32],
             [['tagCustomClass', 'countdownHeading', 'countdownCustomClass'], 'string', 'max' => 255],
             [['tagAssetId'], 'integer'],
             [['productIds', 'variantIds', 'categoryIds', 'exclusionIds', 'siteIds'], 'each', 'rule' => ['integer']],

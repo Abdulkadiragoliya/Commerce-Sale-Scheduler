@@ -33,6 +33,8 @@ class Extension extends AbstractExtension implements GlobalsInterface
             new TwigFunction('saleSchedulerPrice', [$this, 'price'], ['is_safe' => ['html']]),
             new TwigFunction('saleSchedulerCountdown', [$this, 'countdown'], ['is_safe' => ['html']]),
             new TwigFunction('saleSchedulerBlock', [$this, 'saleBlock'], ['is_safe' => ['html']]),
+            new TwigFunction('saleSchedulerCss', [$this, 'css'], ['is_safe' => ['html']]),
+            new TwigFunction('saleSchedulerJs', [$this, 'js'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -72,9 +74,9 @@ class Extension extends AbstractExtension implements GlobalsInterface
         $sale = Plugin::getInstance()->eligibility->getWinningSale($purchasable);
         $calc = $sale ? Plugin::getInstance()->discounts->calculate($originalPrice, $sale, $currency) : null;
 
-        $showOriginal = $options['showOriginal'] ?? ($sale ? $sale->priceShowOriginal : true);
-        $showSavings = $options['showSavings'] ?? ($sale ? $sale->priceShowSavings : true);
-        $showBadge = $options['showBadge'] ?? ($sale ? $sale->priceShowBadge : true);
+        $showOriginal = isset($options['showOriginal']) ? (bool)$options['showOriginal'] : ($sale ? (bool)$sale->priceShowOriginal : true);
+        $showSavings = isset($options['showSavings']) ? (bool)$options['showSavings'] : ($sale ? (bool)$sale->priceShowSavings : true);
+        $showBadge = isset($options['showBadge']) ? (bool)$options['showBadge'] : ($sale ? (bool)$sale->priceShowBadge : true);
         $customClass = Html::encode($options['class'] ?? '');
 
         if (!$calc || !$calc->isSaleApplied) {
@@ -92,17 +94,26 @@ HTML;
         $formattedOrig = $calc->getFormattedOriginalPrice();
         $formattedSavings = $calc->getFormattedSavingsAmount();
         $formattedPercent = $calc->getFormattedSavingsPercent();
-        $badgeText = Html::encode($sale->badgeText ?: "Save {$formattedPercent}");
 
         $origHtml = $showOriginal 
             ? "<span class=\"sale-price-display__original\"><del>{$formattedOrig}</del></span>" 
             : '';
-        $savingsHtml = $showSavings 
-            ? "<span class=\"sale-price-display__savings\">Save {$formattedSavings} ({$formattedPercent})</span>" 
-            : '';
-        $badgeHtml = $showBadge 
-            ? "<span class=\"sale-price-display__badge\">{$badgeText}</span>" 
-            : '';
+
+        $badgeHtml = '';
+        if ($showBadge) {
+            if (!empty($sale->badgeText)) {
+                $customBadge = Html::encode($sale->badgeText);
+                $badgeHtml = "<span class=\"sale-price-display__badge\">{$customBadge}</span>";
+            } elseif (!$showSavings) {
+                // If savings pill is off, display the discount badge
+                $badgeHtml = "<span class=\"sale-price-display__badge\">Save {$formattedPercent}</span>";
+            }
+        }
+
+        $savingsHtml = '';
+        if ($showSavings) {
+            $savingsHtml = "<span class=\"sale-price-display__savings\">Save {$formattedSavings} ({$formattedPercent})</span>";
+        }
 
         $html = <<<HTML
 <div class="sale-price-display sale-price-display--on-sale {$customClass}" data-sale-id="{$sale->id}">

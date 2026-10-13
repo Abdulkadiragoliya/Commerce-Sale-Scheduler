@@ -97,103 +97,327 @@
 }
 
 .sale-price-display__savings {
+    display: inline-flex;
+    align-items: center;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #059669;
+    color: #047857;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    letter-spacing: 0.01em;
 }
 
-/* Countdown Timer */
+/* ==========================================================================
+   Countdown Timer Styles (3 Distinct Visual Themes matching specification)
+   Auto-adjusting & fluid across all container widths (product cards & PDP).
+   ========================================================================== */
+
+/* Base Reset & Variables */
 .sale-countdown-timer {
-    margin: 14px 0;
-    padding: 12px 16px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    max-width: 100%;
-    font-family: inherit;
+    display: flex;
+    flex-direction: column;
     box-sizing: border-box;
+    font-family: inherit;
+    width: 100%;
+    max-width: 100%;
+    transition: all 0.2s ease-in-out;
 }
 
 .sale-countdown__header {
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.sale-countdown__icon {
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 .sale-countdown__heading {
-    font-size: 0.8125rem;
+    font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #4b5563;
+    letter-spacing: 0.06em;
 }
 
 .sale-countdown__units {
     display: flex;
     align-items: center;
-    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .sale-countdown__unit {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    min-width: 44px;
+    justify-content: center;
+    box-sizing: border-box;
+    text-align: center;
 }
 
 .sale-countdown__digit {
-    font-size: 1.25rem;
-    font-weight: 800;
-    line-height: 1.1;
-    color: #111827;
     font-variant-numeric: tabular-nums;
+    line-height: 1;
 }
 
 .sale-countdown__label {
-    font-size: 0.6875rem;
     text-transform: uppercase;
-    color: #6b7280;
-    font-weight: 500;
-    margin-top: 2px;
+    line-height: 1;
 }
 
 .sale-countdown__separator {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #9ca3af;
-    margin-bottom: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
-/* Countdown Boxed Style */
+/* --------------------------------------------------------------------------
+   STYLE 1: Compact Style (Vibrant Cyan Numbers + Suffix Letters 'd', 'h', 'm', 's')
+   Matches User Reference Image (1. COMPACT STYLE)
+   -------------------------------------------------------------------------- */
+.sale-countdown--compact {
+    margin: 8px 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.sale-countdown--compact .sale-countdown__header {
+    margin-bottom: 4px;
+    gap: 6px;
+}
+
+.sale-countdown--compact .sale-countdown__icon {
+    color: var(--sale-countdown-heading-color, #00b4d8);
+}
+
+.sale-countdown--compact .sale-countdown__heading {
+    color: var(--sale-countdown-heading-color, #64748b);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.sale-countdown--compact .sale-countdown__units {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 4px 6px;
+    width: 100%;
+}
+
+.sale-countdown--compact .sale-countdown__unit {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 1px;
+    min-width: auto;
+}
+
+.sale-countdown--compact .sale-countdown__digit {
+    font-size: clamp(1.1rem, 3.5vw, 1.45rem);
+    font-weight: 800;
+    color: var(--sale-countdown-digit-color, #00b4d8);
+    letter-spacing: -0.02em;
+}
+
+.sale-countdown--compact .sale-countdown__label-full {
+    display: none;
+}
+
+.sale-countdown--compact .sale-countdown__label-short {
+    display: inline;
+    font-size: clamp(0.75rem, 2.2vw, 0.95rem);
+    font-weight: 600;
+    color: #475569;
+    margin-left: 1px;
+}
+
+.sale-countdown--compact .sale-countdown__separator {
+    font-size: clamp(1rem, 3vw, 1.35rem);
+    font-weight: 700;
+    color: var(--sale-countdown-digit-color, #00b4d8);
+    margin: 0 3px;
+    opacity: 0.9;
+}
+
+/* --------------------------------------------------------------------------
+   STYLE 2: Boxed Dark Style (4 Rounded Dark Slate Tiles + Amber Digits + White Labels)
+   Matches User Reference Image (2. BOXED DARK STYLE)
+   Auto-adjusts perfectly to fit inside product cards without overflowing!
+   -------------------------------------------------------------------------- */
 .sale-countdown--boxed {
-    background: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin: 10px 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.sale-countdown--boxed .sale-countdown__header {
+    margin-bottom: 8px;
+    gap: 6px;
+}
+
+.sale-countdown--boxed .sale-countdown__icon {
+    color: var(--sale-countdown-heading-color, #f59e0b);
+}
+
+.sale-countdown--boxed .sale-countdown__heading {
+    color: var(--sale-countdown-heading-color, #64748b);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.sale-countdown--boxed .sale-countdown__units {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 4px;
+    box-sizing: border-box;
 }
 
 .sale-countdown--boxed .sale-countdown__unit {
-    background: #111827;
-    color: #ffffff;
-    padding: 6px 8px;
+    flex: 1 1 0%;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #1e2530;
     border-radius: 8px;
-    min-width: 48px;
+    padding: 8px 2px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.22);
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .sale-countdown--boxed .sale-countdown__digit {
+    font-size: clamp(1.05rem, 3.8vw, 1.55rem);
+    font-weight: 800;
+    color: var(--sale-countdown-digit-color, #f59e0b);
+    letter-spacing: -0.01em;
+}
+
+.sale-countdown--boxed .sale-countdown__label-short {
+    display: none;
+}
+
+.sale-countdown--boxed .sale-countdown__label-full {
+    display: block;
+    font-size: clamp(0.48rem, 1.6vw, 0.65rem);
+    font-weight: 700;
     color: #ffffff;
+    letter-spacing: 0.04em;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
-.sale-countdown--boxed .sale-countdown__label {
-    color: #9ca3af;
+.sale-countdown--boxed .sale-countdown__separator {
+    font-size: clamp(0.9rem, 3vw, 1.25rem);
+    font-weight: 800;
+    color: var(--sale-countdown-digit-color, #f59e0b);
+    margin: 0 1px;
 }
 
-/* Countdown Minimal Style */
+/* --------------------------------------------------------------------------
+   STYLE 3: Minimal Style (Clean Light Thin-Grotesque Digits + Vertical Dividers)
+   Matches User Reference Image (3. MINIMAL STYLE)
+   Auto-adjusts perfectly across card columns!
+   -------------------------------------------------------------------------- */
 .sale-countdown--minimal {
+    margin: 10px 0;
+    padding: 0;
     background: transparent;
     border: none;
-    padding: 0;
+    box-shadow: none;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.sale-countdown--minimal .sale-countdown__header {
+    margin-bottom: 8px;
+    gap: 6px;
+}
+
+.sale-countdown--minimal .sale-countdown__icon {
+    color: var(--sale-countdown-heading-color, #64748b);
+}
+
+.sale-countdown--minimal .sale-countdown__heading {
+    color: var(--sale-countdown-heading-color, #64748b);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.sale-countdown--minimal .sale-countdown__units {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.sale-countdown--minimal .sale-countdown__unit {
+    flex: 1 1 0%;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: 2px 4px;
 }
 
 .sale-countdown--minimal .sale-countdown__digit {
-    font-size: 1.125rem;
-    color: #dc2626;
+    font-size: clamp(1.2rem, 4.5vw, 1.85rem);
+    font-weight: 300;
+    color: var(--sale-countdown-digit-color, #0f172a);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing: -0.03em;
+}
+
+.sale-countdown--minimal .sale-countdown__label-short {
+    display: none;
+}
+
+.sale-countdown--minimal .sale-countdown__label-full {
+    display: block;
+    font-size: clamp(0.55rem, 1.9vw, 0.7rem);
+    font-weight: 500;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    margin-top: 2px;
+    white-space: nowrap;
+}
+
+.sale-countdown--minimal .sale-countdown__separator {
+    width: 1px;
+    height: 32px;
+    background: rgba(148, 163, 184, 0.35);
+    margin: 0 4px;
+    font-size: 0;
+    color: transparent;
+    display: inline-block;
+    flex-shrink: 0;
 }
 
 /* Cohesive Sale Block */

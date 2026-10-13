@@ -9,36 +9,36 @@
 
 {% block content %}
     {# Stats Grid #}
-    <div class="sale-scheduler-dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px;">
-            <div style="font-size:12px; font-weight:600; color:#6a737d; text-transform:uppercase; margin-bottom:6px;">{{ "Total Sales"|t('commerce-sale-scheduler') }}</div>
-            <div style="font-size:28px; font-weight:700; color:#1f2328;">{{ stats.total }}</div>
+    <div class="sale-scheduler-dashboard-grid">
+        <div class="sale-stat-card">
+            <div class="sale-stat-card__title">{{ "Total Sales"|t('commerce-sale-scheduler') }}</div>
+            <div class="sale-stat-card__value">{{ stats.total }}</div>
         </div>
 
-        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px; border-left:4px solid #1a7f37;">
-            <div style="font-size:12px; font-weight:600; color:#1a7f37; text-transform:uppercase; margin-bottom:6px;">{{ "Active Sales"|t('commerce-sale-scheduler') }}</div>
-            <div style="font-size:28px; font-weight:700; color:#1a7f37;">{{ stats.active }}</div>
+        <div class="sale-stat-card sale-stat-card--active" style="border-left: 4px solid #16a34a;">
+            <div class="sale-stat-card__title" style="color:#16a34a;">{{ "Active Sales"|t('commerce-sale-scheduler') }}</div>
+            <div class="sale-stat-card__value">{{ stats.active }}</div>
         </div>
 
-        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px; border-left:4px solid #0969da;">
-            <div style="font-size:12px; font-weight:600; color:#0969da; text-transform:uppercase; margin-bottom:6px;">{{ "Scheduled"|t('commerce-sale-scheduler') }}</div>
-            <div style="font-size:28px; font-weight:700; color:#0969da;">{{ stats.scheduled }}</div>
+        <div class="sale-stat-card sale-stat-card--scheduled" style="border-left: 4px solid #2563eb;">
+            <div class="sale-stat-card__title" style="color:#2563eb;">{{ "Scheduled"|t('commerce-sale-scheduler') }}</div>
+            <div class="sale-stat-card__value">{{ stats.scheduled }}</div>
         </div>
 
-        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px; border-left:4px solid #bf8700;">
-            <div style="font-size:12px; font-weight:600; color:#bf8700; text-transform:uppercase; margin-bottom:6px;">{{ "Expiring Soon (48h)"|t('commerce-sale-scheduler') }}</div>
-            <div style="font-size:28px; font-weight:700; color:#bf8700;">{{ stats.expiringSoon }}</div>
+        <div class="sale-stat-card sale-stat-card--expiring" style="border-left: 4px solid #d97706;">
+            <div class="sale-stat-card__title" style="color:#d97706;">{{ "Expiring Soon (48h)"|t('commerce-sale-scheduler') }}</div>
+            <div class="sale-stat-card__value">{{ stats.expiringSoon }}</div>
         </div>
 
-        <div class="sale-stat-card" style="background:#fff; border:1px solid #e3e5e8; border-radius:8px; padding:16px 20px; border-left:4px solid #cf222e;">
-            <div style="font-size:12px; font-weight:600; color:#cf222e; text-transform:uppercase; margin-bottom:6px;">{{ "Pricing Conflicts"|t('commerce-sale-scheduler') }}</div>
-            <div style="font-size:28px; font-weight:700; color:#cf222e;">{{ stats.conflicts }}</div>
+        <div class="sale-stat-card sale-stat-card--conflicts" style="border-left: 4px solid #dc2626;">
+            <div class="sale-stat-card__title" style="color:#dc2626;">{{ "Pricing Conflicts"|t('commerce-sale-scheduler') }}</div>
+            <div class="sale-stat-card__value">{{ stats.conflicts }}</div>
         </div>
     </div>
 
     {# Conflicts Notice #}
     {% if conflicts|length %}
-        <div class="notice" style="background:#fff8c5; border:1px solid #d4a72c; border-radius:6px; padding:14px 18px; margin-bottom:24px; color:#4d2d00;">
+        <div class="sale-conflict-box">
             <p style="font-weight:700; margin:0 0 6px 0;">⚠️ {{ "Pricing Conflicts Detected"|t('commerce-sale-scheduler') }}</p>
             <ul style="margin:0; padding-left:18px;">
                 {% for conflict in conflicts %}
@@ -50,56 +50,79 @@
         </div>
     {% endif %}
 
-    {# Recent Sales Table #}
-    <h2>{{ "Recently Updated Sales"|t('commerce-sale-scheduler') }}</h2>
+    {# Recent Sales Panel #}
+    <div class="sale-panel">
+        <div class="sale-panel-header">
+            <div class="sale-panel-title-group">
+                <span class="sale-panel-icon sale-panel-icon--blue">⏱️</span>
+                <div>
+                    <h3 class="sale-panel-title">{{ "Recently Updated Sales"|t('commerce-sale-scheduler') }}</h3>
+                    <p class="sale-panel-subtitle">{{ "Latest promotional events configured in your store."|t('commerce-sale-scheduler') }}</p>
+                </div>
+            </div>
+            <div>
+                <a href="{{ cpUrl('sale-scheduler/sales') }}" class="btn small">{{ "View All Sales"|t('commerce-sale-scheduler') }} &rarr;</a>
+            </div>
+        </div>
 
-    {% if recentSales|length %}
-        <table class="data fullwidth">
-            <thead>
-                <tr>
-                    <th scope="col">{{ "Sale Name"|t('commerce-sale-scheduler') }}</th>
-                    <th scope="col">{{ "Status"|t('commerce-sale-scheduler') }}</th>
-                    <th scope="col">{{ "Discount"|t('commerce-sale-scheduler') }}</th>
-                    <th scope="col">{{ "Schedule"|t('commerce-sale-scheduler') }}</th>
-                    <th scope="col">{{ "Priority"|t('commerce-sale-scheduler') }}</th>
-                    <th scope="col">{{ "Actions"|t('commerce-sale-scheduler') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sale in recentSales %}
-                    {% set status = sale.getStatus() %}
-                    <tr>
-                        <td>
-                            <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}"><strong>{{ sale.name }}</strong></a>
-                            {% if sale.description %}
-                                <div class="light" style="font-size:12px;">{{ sale.description|slice(0, 80) }}</div>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span class="status {{ status == 'active' ? 'green' : (status == 'scheduled' ? 'blue' : (status == 'expired' ? 'disabled' : 'red')) }}"></span>
-                            {{ sale.getStatusLabel() }}
-                        </td>
-                        <td>
-                            <code>{{ sale.getFormattedDiscount() }}</code>
-                        </td>
-                        <td class="light" style="font-size:12px;">
-                            {% if sale.dateFrom or sale.dateTo %}
-                                {{ sale.dateFrom ? sale.dateFrom|date('short') : 'Anytime' }} &rarr; {{ sale.dateTo ? sale.dateTo|date('short') : 'Ongoing' }}
-                            {% else %}
-                                {{ "Always active"|t('commerce-sale-scheduler') }}
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ sale.priority }}
-                        </td>
-                        <td>
-                            <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}" class="btn small">{{ "Edit"|t('commerce-sale-scheduler') }}</a>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p class="light">{{ "No sales configured yet."|t('commerce-sale-scheduler') }} <a href="{{ cpUrl('sale-scheduler/sales/new') }}">{{ "Create your first sale"|t('commerce-sale-scheduler') }} &rarr;</a></p>
-    {% endif %}
+        {% if recentSales|length %}
+            <div style="overflow-x:auto;">
+                <table class="data fullwidth" style="margin:0;">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ "Sale Name"|t('commerce-sale-scheduler') }}</th>
+                            <th scope="col">{{ "Status"|t('commerce-sale-scheduler') }}</th>
+                            <th scope="col">{{ "Discount"|t('commerce-sale-scheduler') }}</th>
+                            <th scope="col">{{ "Schedule"|t('commerce-sale-scheduler') }}</th>
+                            <th scope="col">{{ "Priority"|t('commerce-sale-scheduler') }}</th>
+                            <th scope="col" style="text-align:right;">{{ "Actions"|t('commerce-sale-scheduler') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in recentSales %}
+                            {% set status = sale.getStatus() %}
+                            <tr>
+                                <td>
+                                    <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}" style="font-weight:600; color:#0f172a; text-decoration:none;">
+                                        {{ sale.name }}
+                                    </a>
+                                    {% if sale.description %}
+                                        <div class="light" style="font-size:12px; margin-top:2px;">{{ sale.description|slice(0, 80) }}</div>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="sale-status-badge sale-status-badge--{{ status }}">
+                                        {{ sale.getStatusLabel() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span style="display:inline-block; font-weight:700; background:#f1f5f9; padding:3px 8px; border-radius:6px; font-size:13px; color:#0f172a;">
+                                        {{ sale.getFormattedDiscount() }}
+                                    </span>
+                                </td>
+                                <td class="light" style="font-size:12px;">
+                                    {% if sale.dateFrom or sale.dateTo %}
+                                        <div><strong>{{ sale.dateFrom ? sale.dateFrom|date('short') : 'Immediate' }}</strong> &rarr; <strong>{{ sale.dateTo ? sale.dateTo|date('short') : 'Ongoing' }}</strong></div>
+                                    {% else %}
+                                        <span class="light">{{ "Always active"|t('commerce-sale-scheduler') }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge" style="font-size:11px;">{{ sale.priority }}</span>
+                                </td>
+                                <td style="text-align:right;">
+                                    <a href="{{ cpUrl('sale-scheduler/sales/' ~ sale.id) }}" class="btn small">{{ "Edit"|t('commerce-sale-scheduler') }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty" style="text-align:center; padding:40px 20px;">
+                <p class="light" style="margin-bottom:12px;">{{ "No sales configured yet."|t('commerce-sale-scheduler') }}</p>
+                <a href="{{ cpUrl('sale-scheduler/sales/new') }}" class="btn submit add icon">{{ "Create your first sale"|t('commerce-sale-scheduler') }}</a>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

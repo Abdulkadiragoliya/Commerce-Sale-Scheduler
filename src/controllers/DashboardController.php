@@ -6,6 +6,7 @@ namespace abdulkadiragoliya\commercesalescheduler\controllers;
 use Craft;
 use craft\web\Controller;
 use abdulkadiragoliya\commercesalescheduler\Plugin;
+use abdulkadiragoliya\commercesalescheduler\web\assets\cp\CpAsset;
 use yii\web\Response;
 
 /**
@@ -20,6 +21,7 @@ class DashboardController extends Controller
     {
         $this->requireCpRequest();
         $this->requirePermission('commerce-sale-scheduler:manage');
+        Craft::$app->getView()->registerAssetBundle(CpAsset::class);
         return parent::beforeAction($action);
     }
 

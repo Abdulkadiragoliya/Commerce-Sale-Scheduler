@@ -1,12 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ef4444"/>
-      <stop offset="100%" stop-color="#b91c1c"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="6" fill="url(#grad)"/>
-  <path d="M9 7v3M23 7v3M6 11h20M7 8h18a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2z" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="16" cy="18" r="4" fill="none" stroke="#ffffff" stroke-width="1.5"/>
-  <polyline points="16 16 16 18 18 19" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 70" width="70" height="70">
+  <!-- Background Badge -->
+  <rect width="70" height="70" rx="16" fill="#EFA132"/>
+
+  <!-- Calendar Base -->
+  <rect x="17" y="20" width="36" height="34" rx="5" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+  <path d="M17 29h36" stroke="#FFFFFF" stroke-width="3"/>
+
+  <!-- Calendar Pins -->
+  <path d="M25 15v8M45 15v8" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Sale Tag Icon (Top Right Accent) -->
+  <path d="M41 37l8-8 6 6-8 8h-6v-6z" fill="#FFFFFF"/>
+  <circle cx="44" cy="34" r="1.2" fill="#EFA132"/>
+
+  <!-- Live Countdown Clock (Bottom Left Accent) -->
+  <circle cx="28" cy="42" r="7" fill="#EFA132" stroke="#FFFFFF" stroke-width="2.5"/>
+  <path d="M28 38.5v3.5l2.5 1.5" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

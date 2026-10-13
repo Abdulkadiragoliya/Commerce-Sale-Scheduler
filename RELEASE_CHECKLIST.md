@@ -2,9 +2,10 @@
 
 * **Plugin Name**: Commerce Sale Scheduler
 * **Composer Package**: `abdulkadiragoliya/commerce-sale-scheduler`
-* **Target Platforms**: Craft CMS 5 (`5.10.14`) and Craft Commerce 5 (`5.7.5`)
-* **PHP Runtime**: PHP `8.2.0`
-* **Test Suite Result**: 17 / 17 tests passed (0 failures)
+* **Version**: `1.0.0`
+* **Target Platforms**: Craft CMS 5 (`^5.0.0`) / Craft CMS 4 (`^4.0.0`) & Craft Commerce 5 (`^5.0.0`) / Craft Commerce 4 (`^4.0.0`)
+* **PHP Runtime**: PHP `^8.2.0`
+* **Test Suite Result**: 18 / 18 tests passed (0 failures)
 
 ---
 
@@ -20,6 +21,7 @@
 | **No advertised navigation link returns 404** | Verified | All subnav links and action URLs mapped to valid controller actions. |
 | **No valid plugin workflow produces an HTTP 500** | Verified | All controller actions, inputs, and template variables verified. |
 | **All sale CRUD operations work** | Verified | Create, Read, Update, Duplicate, Delete, and Toggle verified in `SaleCrudIntegrationTest`. |
+| **Top & Bottom Save Buttons Work** | Verified | Single root `<form id="main-form">` integrated with Craft CP layout; clean submission. |
 | **Fixed discounts work** | Verified | Verified in `DiscountEngineTest`; includes zero and product price floor validation. |
 | **Percentage discounts work** | Verified | Verified in `DiscountEngineTest`; includes boundary validation up to 100%. |
 | **Product assignments work** | Verified | Direct product assignment and cascading DB relations verified. |
@@ -32,17 +34,19 @@
 | **Start and end scheduling works** | Verified | Date boundaries and UTC timestamps evaluated in `EligibilityTest`. |
 | **Sale expiry is enforced by the server** | Verified | Expired sales strictly return empty countdowns and revert prices on server. |
 | **Tag asset selection works** | Verified | Craft Asset element selector integrated into sale edit form. |
-| **Tag placement works in listings** | Verified | Tested via `craft.saleScheduler.tag(product, { context: 'listing' })`. |
-| **Tag placement works on product pages** | Verified | Tested via `craft.saleScheduler.tag(product, { context: 'detail' })`. |
-| **Countdown works** | Verified | Semantic timer rendered with days, hours, mins, secs and live JS ticking. |
-| **Price components work** | Verified | Original price strikethrough, sale price, and savings pill badge verified. |
-| **Actual Commerce pricing remains consistent with checkout** | Verified | `LineItems::EVENT_POPULATE_LINE_ITEM` and `SaleAdjuster` ensure cart and checkout match. |
-| **Existing Twig templates can integrate components** | Verified | Verified with non-destructive drop-in Twig functions. |
+| **Tag placement works in listings** | Verified | Tested via `saleSchedulerTag(product, { context: 'listing' })`. |
+| **Tag placement works on product pages** | Verified | Tested via `saleSchedulerTag(product, { context: 'detail' })`. |
+| **3 Countdown styles match design specification** | Verified | `boxed` (dark tiles + amber digits), `compact` (cyan digits + short units), `minimal` (pipe divider lines). |
+| **Countdown containers auto-adjust without overflow** | Verified | Fluid flexbox layout with `flex: 1 1 0%` and `clamp()` typography scales across cards and PDP. |
+| **Live countdown without zero-flash** | Verified | Server pre-computes remaining days/hours/minutes/seconds on render; JS ticks in real time. |
+| **Price components work cleanly** | Verified | Original price strikethrough, discounted price, and single consolidated savings pill (`Save $XX.XX (XX%)`). |
+| **Add to Cart & Checkout Compatibility** | Verified | `LineItems::EVENT_POPULATE_LINE_ITEM` and `SaleAdjuster` use safe `setPromotionalPrice` hooks; verified with live Add-to-Bag flow on Bomber Jacket. |
+| **Twig Variable & Global Functions Supported** | Verified | Both `saleScheduler*` global functions and `craft.saleScheduler.*` variable registered and working. |
 | **Settings persist correctly** | Verified | Verified in `SettingsTest` and `SettingsController::actionSave`. |
 | **Permissions and security checks work** | Verified | `commerce-sale-scheduler:manage` permission registered and required by all CP controllers. |
 | **Cache invalidation works** | Verified | Cache tag `commerce_sale_scheduler` invalidated on sale/product saves and deletes. |
 | **Responsive and accessibility checks pass** | Verified | Timers have `role="timer"` and `aria-live="polite"`; tags have accessible alt text. |
 | **Multi-site and currency behavior supported** | Verified | Store payment currency dynamically used; site scoping supported. |
-| **Automated tests pass** | Verified | 17 unit and integration tests passing in `tests/run.php`. |
+| **Automated tests pass** | Verified | 18 unit and integration tests passing in `tests/run.php`. |
 | **Documentation is complete** | Verified | `README.md`, `ADMIN_GUIDE.md`, `DEVELOPER_GUIDE.md`, `ARCHITECTURE.md`, `TESTING.md`. |
-| **No critical or high-severity defect remains** | Verified | All syntax, database, and rendering checks confirmed clean. |
+| **Ready for Craft Plugin Store** | Verified | Valid composer metadata, icon SVG, changelog, and clean codebase. |

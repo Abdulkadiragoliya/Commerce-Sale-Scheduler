@@ -32,6 +32,8 @@ use yii\db\ActiveQuery;
  * @property string|null $countdownHeading
  * @property bool $countdownShowListing
  * @property bool $countdownShowDetail
+ * @property string|null $countdownHeadingColor
+ * @property string|null $countdownDigitsColor
  * @property string|null $countdownCustomClass
  * @property bool $priceShowOriginal
  * @property bool $priceShowSavings
