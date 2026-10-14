@@ -49,6 +49,7 @@
     "developer": "Abdulkadir Agoliya",
     "developerUrl": "https://github.com/Abdulkadiragoliya",
     "documentationUrl": "https://github.com/Abdulkadiragoliya/Commerce-Sale-Scheduler#readme",
+    "changelogUrl": "https://raw.githubusercontent.com/Abdulkadiragoliya/Commerce-Sale-Scheduler/main/CHANGELOG.md",
     "class": "abdulkadiragoliya\\commercesalescheduler\\Plugin"
   }
 }
